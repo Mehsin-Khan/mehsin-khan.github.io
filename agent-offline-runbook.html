@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Runbook: agent installed but offline — Mohsin Anwar Sharif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--text:#2B3445;--muted:#5B6578;--paper:#F6F7F9;--card:#FFFFFF;--line:#D8DDE6;--ok:#1B7F5B;--warn:#B7791F;--risk:#B83227;--blue:#2754C5;--soft:#EEF2F8;--code:#0F172A;--codet:#E2E8F0;
+--f:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--fc:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;--fm:"IBM Plex Mono",Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535;--code:#0B1020}}
+:root[data-theme="dark"]{--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535;--code:#0B1020}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--text);font:16px/1.6 var(--f)}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--fc);color:var(--ink);line-height:1.15;margin:0}
+h1{font-size:clamp(32px,5.4vw,54px);font-weight:700;max-width:18ch}
+h2{font-size:clamp(24px,3.2vw,32px);font-weight:600;margin-bottom:12px}
+p{margin:0 0 12px;max-width:66ch}
+a{color:var(--blue)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:22px 0;color:var(--muted);font-size:15px}
+.top strong{color:var(--ink)}
+.hero{padding:34px 0 30px}
+.hero p{font-size:18px}
+section{padding:36px 0;border-top:1px solid var(--line)}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px}
+.stepno{color:var(--blue);font-family:var(--fc);font-weight:700;font-size:15px}
+.q{font-family:var(--fc);font-size:26px;color:var(--ink);margin:6px 0 10px}
+pre{background:var(--code);color:var(--codet);font:14px/1.55 var(--fm);padding:14px 16px;border-radius:6px;overflow-x:auto;margin:10px 0 14px}
+.why{font-size:15px;color:var(--muted)}
+.case{border-left:4px solid var(--warn);background:var(--soft);padding:10px 14px;border-radius:4px;font-size:15px;margin:10px 0 14px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button{font:600 15px var(--f);padding:10px 18px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.yes{background:var(--ok);border-color:var(--ok);color:#fff}
+button.no{background:var(--risk);border-color:var(--risk);color:#fff}
+.fix{border:2px solid var(--risk);border-radius:8px;padding:16px;margin-top:6px}
+.done{border:2px solid var(--ok);border-radius:8px;padding:16px;margin-top:6px}
+.trail{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:0;list-style:none}
+.trail li{font-size:13px;padding:4px 10px;border-radius:12px;background:var(--soft);color:var(--muted)}
+.trail li.pass{color:var(--ok)} .trail li.fail{color:var(--risk)}
+ol.all{padding-left:22px}
+ol.all li{margin:10px 0}
+ol.all b{color:var(--ink)}
+footer{padding:30px 0 46px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><span><strong>Mohsin Anwar Sharif</strong></span><span><a href="index.html">Portfolio home</a> &nbsp; <a href="endpoint-control-assurance.html">Case study</a></span></header>
+<div class="hero">
+<h1>An agent says "installed" but shows offline. Now what?</h1>
+<p>This is the method I used as an EDR administrator in a multi-country bank before escalating to the vendor. Each check rules out one layer, from name resolution up to the agent itself, so that when a case does reach the vendor it arrives with evidence, not guesses.</p>
+<p class="why">Walk through it below. Commands are shown for SentinelOne on Windows; the console address is a placeholder and no real configuration is published.</p>
+</div>
+
+<section>
+<ul class="trail" id="trail" aria-label="Checks completed"></ul>
+<div class="stage" id="stage" aria-live="polite"></div>
+</section>
+
+<section>
+<h2>The whole method on one page</h2>
+<ol class="all" id="all"></ol>
+</section>
+
+<section>
+<h2>Why this matters</h2>
+<p>A console will count this device as covered. It is not. The difference between "agent present" and "actually protected" was the gap I reported to the CISO every two weeks, and this runbook is how individual devices got moved from one side of that line to the other.</p>
+<p><a href="endpoint-control-assurance.html">See the estate-level view in the case study</a>.</p>
+</section>
+</div>
+<footer><div class="wrap">Placeholder addresses only. No employer hostnames, tokens or passphrases are published.</div></footer>
+<script>
+const STEPS=[
+ {t:"Is the device powered on and in use?",c:"Confirm with the user or the asset owner, or check last logon in your management tool.",w:"Devices that are off, in storage or retired look exactly like broken agents. Ruling this out first saves the most time.",fail:"Mark the device as off or retired in the inventory. It leaves the coverage denominator; it is not an agent fault."},
+ {t:"Does the console name resolve to an IP address?",c:"nslookup your-console.example.net\nping your-console.example.net",w:"Ping may time out and still pass: what matters is that the name resolves to an address.",fail:"Name resolution problem. Check DNS settings and any proxy the device uses, then retest."},
+ {t:"Can the device reach the console on port 443?",c:"Test-NetConnection your-console.example.net -Port 443\n(or: telnet your-console.example.net 443)",w:"This isolates firewall and web-proxy paths. Agents talk to the console over 443.",fail:"Network path blocked. Check the firewall rule and the web proxy: the console domain usually needs an SSL-inspection bypass.",case:"During the Defender and Zscaler rollouts, blocked telemetry domains were the most common reason agents never came online."},
+ {t:"Are the agent services running?",c:"services.msc  (look for the Sentinel Agent services)\ntasklist | findstr /i sentinel",w:"An agent can be installed with its services stopped or crashed.",fail:"Start the services. If they will not start, collect logs and plan an approved reinstall with the infrastructure team."},
+ {t:"Is the agent pointed at the right console and site?",c:"sentinelctl status\nsentinelctl config server.mgmtServer\nsentinelctl config server.site",w:"Images, clones and migrations leave agents bound to an old console or the wrong site.",fail:"Re-bind the agent to the correct site using the approved site token, then confirm it registers.",case:"After the console moves between on-prem and cloud, mis-bound agents were a recurring cause of 'installed but offline'."},
+ {t:"Is the event log free of registration or certificate errors?",c:"Event Viewer > Applications and Services Logs > SentinelOne > Operational\nLook for registration and certificate errors.",w:"If the console certificate has expired or is not trusted, every agent on that console drops at once.",fail:"Check certificate trust on the device and the validity of the console certificate. Renew or re-import as needed.",case:"About 450 agents in one entity went offline together when a console certificate expired. I renewed it manually, then set expiry reminders on team mailboxes so it could not depend on one person."},
+ {t:"Still offline after all of the above?",c:"Run the vendor log collector into a working folder\n+ the vendor connectivity-check script output",w:"At this point the vendor needs evidence, not a description.",fail:null,escalate:"Escalate to the vendor with the logs and the results of every check above. Cases opened this way skip the first round of 'please try the following'."},
+];
+const DONE="Retest before closing: the agent shows online, all engines report healthy, and a test alert reaches the SIEM. Only then does the device count as protected.";
+let i=0, hist=[];
+const $=id=>document.getElementById(id);
+function trail(){ $("trail").innerHTML=hist.map((h,k)=>`<li class="${h?'pass':'fail'}">${k+1}. ${h?'passed':'failed'}</li>`).join(""); }
+function show(){
+ const s=STEPS[i]; trail();
+ if(s.escalate){ $("stage").innerHTML=`<div class="stepno">Check ${i+1} of ${STEPS.length}</div><div class="q">${s.t}</div><pre>${s.c}</pre><p class="why">${s.w}</p><div class="fix"><b>Escalate.</b> ${s.escalate}</div><p style="margin-top:14px">${DONE}</p><div class="btns"><button onclick="restart()">Start again</button></div>`; return; }
+ $("stage").innerHTML=`<div class="stepno">Check ${i+1} of ${STEPS.length}</div><div class="q">${s.t}</div><pre>${s.c}</pre><p class="why">${s.w}</p>${s.case?`<div class="case"><b>From the field:</b> ${s.case}</div>`:""}<div class="btns"><button class="yes" onclick="ans(true)">Yes, passes</button><button class="no" onclick="ans(false)">No, fails</button></div>`;
+}
+function ans(ok){ hist.push(ok); const s=STEPS[i];
+ if(!ok){ trail(); $("stage").innerHTML=`<div class="stepno">Check ${i+1} failed</div><div class="q">${s.t}</div><div class="fix"><b>Fix.</b> ${s.fail}</div><p style="margin-top:14px">${DONE}</p><div class="btns"><button onclick="restart()">Start again</button></div>`; return; }
+ i++; show(); }
+function restart(){ i=0; hist=[]; show(); }
+$("all").innerHTML=STEPS.map(s=>`<li><b>${s.t}</b> ${s.w}</li>`).join("")+`<li><b>Retest and close.</b> ${DONE}</li>`;
+show();
+</script>
+</body>
+</html>
