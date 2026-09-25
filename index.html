@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mohsin Anwar Sharif — Endpoint Security & Control Assurance</title>
+<meta name="description" content="Portfolio of Mohsin Anwar Sharif: endpoint security, security delivery and control assurance in regulated banking.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--text:#2B3445;--muted:#5B6578;--paper:#F6F7F9;--card:#FFFFFF;--line:#D8DDE6;--ok:#1B7F5B;--warn:#B7791F;--risk:#B83227;--blue:#2754C5;--soft:#EEF2F8;
+--f:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--fc:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535}}
+:root[data-theme="dark"]{--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--text);font:16px/1.6 var(--f)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--fc);color:var(--ink);line-height:1.15;margin:0}
+h1{font-size:clamp(36px,6.2vw,64px);font-weight:700;max-width:15ch}
+h2{font-size:clamp(26px,3.4vw,34px);font-weight:600;margin-bottom:14px}
+h3{font-size:19px;font-weight:600;margin-bottom:6px}
+p{margin:0 0 12px;max-width:66ch}
+a{color:var(--blue)}
+a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;padding:22px 0;color:var(--muted);font-size:15px}
+.top strong{color:var(--ink);font-weight:600}
+.hero{padding:40px 0 34px}
+.hero .role{font-size:19px;margin-top:18px}
+.status{display:inline-block;margin-top:14px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);font-size:15px;color:var(--ok);font-weight:500}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px}
+.tile b{display:block;font-family:var(--fc);font-size:34px;color:var(--ink);line-height:1.1}
+.tile span{font-size:14px;color:var(--muted);line-height:1.35;display:block;margin-top:4px}
+section{padding:42px 0;border-top:1px solid var(--line)}
+.feature{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:26px}
+.mini{background:var(--soft);border-radius:8px;padding:18px}
+.mini .r{display:grid;grid-template-columns:120px 1fr 52px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.mini .t{height:14px;background:var(--card);border-radius:3px;overflow:hidden}
+.mini .t i{display:block;height:100%}
+.btn{display:inline-block;margin-top:8px;padding:11px 18px;border-radius:6px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:600}
+.btn:hover{opacity:.9}
+.stories{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.story{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:6px;padding:16px}
+.story p{font-size:15px;margin:0}
+.timeline{list-style:none;padding:0;margin:0}
+.timeline li{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.timeline .when{color:var(--muted);font-variant-numeric:tabular-nums;font-size:15px}
+.timeline b{color:var(--ink)}
+.certs{display:flex;flex-wrap:wrap;gap:10px}
+.cert{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:15px}
+.cert b{color:var(--ink)}
+.contact{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px}
+footer{padding:30px 0 46px;color:var(--muted);font-size:14px}
+@media (max-width:820px){.tiles{grid-template-columns:repeat(2,1fr)}.feature{grid-template-columns:1fr}.stories{grid-template-columns:1fr}.timeline li{grid-template-columns:1fr;gap:2px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><span><strong>Mohsin Anwar Sharif</strong></span><span><a href="#work">Work</a> &nbsp; <a href="#stories">Stories</a> &nbsp; <a href="#contact">Contact</a></span></header>
+
+<div class="hero">
+<h1>I make sure security controls actually work.</h1>
+<p class="role">Endpoint security and control assurance specialist. Six years inside a bank operating in seven countries, running SentinelOne, Microsoft Defender and Zscaler through growth, migration and audit. CISM and CIPP/E certified.</p>
+<span class="status">Available immediately. Saudi work visa held; relocating to Riyadh.</span>
+<div class="tiles">
+ <div class="tile"><b>~18,000</b><span>assets across seven countries</span></div>
+ <div class="tile"><b>9</b><span>SentinelOne consoles run, two on-prem and seven cloud</span></div>
+ <div class="tile"><b>1st</b><span>security product the bank moved to the cloud, with regulator sign-off</span></div>
+ <div class="tile"><b>478</b><span>unprotected devices found that the console counted as covered</span></div>
+</div>
+</div>
+
+<section id="work">
+<h2>Featured work</h2>
+<div class="feature">
+ <div>
+  <h3>Endpoint Control Assurance</h3>
+  <p>At the bank I built a workbook by hand that joined ten security tools against the asset inventory, to answer one question: which devices are actually protected? This is that design rebuilt on fictional data, with an interactive dashboard and the ten defects I found and fixed in my original.</p>
+  <a class="btn" href="endpoint-control-assurance.html">Open the case study</a>
+ </div>
+ <div class="mini" aria-label="Preview of the presence versus protection comparison">
+  <div class="r"><span>Agent present</span><div class="t"><i style="width:97.9%;background:var(--blue)"></i></div><b>97.9%</b></div>
+  <div class="r"><span>Actually protected</span><div class="t"><i style="width:91.3%;background:var(--ok)"></i></div><b>91.3%</b></div>
+  <p style="font-size:13px;color:var(--muted);margin:10px 0 0">Fictional 1,500-device estate. No employer data.</p>
+ </div>
+</div>
+</section>
+
+<section id="stories">
+<h2>Six stories I can walk you through</h2>
+<div class="stories">
+ <div class="story"><h3>The numbers were falling</h3><p>Defender onboarding lagged behind target. I split the gap by cause and cleared each list with the team that owned it.</p></div>
+ <div class="story"><h3>First to the cloud</h3><p>Won central bank and risk-committee sign-off by answering data retention and deletion questions in writing.</p></div>
+ <div class="story"><h3>The silent outage</h3><p>About 450 agents dropped offline on an expired certificate. I renewed it, then made expiry alerts a team responsibility.</p></div>
+ <div class="story"><h3>Caught in Deep Visibility</h3><p>A phishing payload tried to switch off antivirus. The device was quarantined before damage was done.</p></div>
+ <div class="story"><h3>Saying no</h3><p>I refused a request to keep EDR disabled during a file transfer and explained which controls would catch it.</p></div>
+ <div class="story"><h3>Finding my own bugs</h3><p>Rebuilding my workbook, I found ten defects, including drifting lookups. The public version fixes all of them.</p></div>
+</div>
+</section>
+
+<section>
+<h2>Experience</h2>
+<ul class="timeline">
+ <li><span class="when">2019 – 2025</span><div><b>Ahli United Bank, then Kuwait Finance House</b>, Bahrain. Endpoint and information security specialist via First Defense and Gulf Business Machines. SentinelOne administration and cloud migration, Defender PoC and rollout, Zscaler, Darktrace and BigID rollouts, control reporting to the CISO.</div></li>
+ <li><span class="when">2018 – 2019</span><div><b>Transworld Information Systems.</b> IT security and infrastructure specialist.</div></li>
+ <li><span class="when">2014 – 2018</span><div><b>SGE Enterprise</b>, Bahrain. Sales and operations manager leading a team of 15.</div></li>
+ <li><span class="when">2008 – 2014</span><div><b>Zain Telecommunications</b> via ITS. System analyst in the 24/7 network operations centre.</div></li>
+</ul>
+</section>
+
+<section>
+<h2>Certifications</h2>
+<div class="certs">
+ <span class="cert"><b>CISM</b>, ISACA</span>
+ <span class="cert"><b>CIPP/E</b>, IAPP</span>
+ <span class="cert"><b>ISO/IEC 27001 Lead Auditor</b></span>
+ <span class="cert"><b>GRCP</b> and <b>IAIP</b>, OCEG</span>
+ <span class="cert"><b>Qualys Certified Specialist</b> in EDR, PCI Compliance, Cloud Agent and TruRisk</span>
+</div>
+</section>
+
+<section id="contact">
+<div class="contact">
+<h2>Contact</h2>
+<p><a href="mailto:mohsin_sharif1@outlook.com">mohsin_sharif1@outlook.com</a><br>+973 3447 9797 (WhatsApp)<br><a href="https://www.linkedin.com/in/mohsin-sharif-mr/">LinkedIn profile</a></p>
+<p style="margin:0">CV available on request, tailored for endpoint security, security delivery, IT risk or privacy roles.</p>
+</div>
+</section>
+</div>
+<footer><div class="wrap">Everything on this site uses fictional data. No employer information is published.</div></footer>
+</body>
+</html>
