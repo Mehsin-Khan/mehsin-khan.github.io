@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agent scripts — Mohsin Anwar Sharif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--text:#2B3445;--muted:#5B6578;--paper:#F6F7F9;--card:#FFFFFF;--line:#D8DDE6;--ok:#1B7F5B;--warn:#B7791F;--risk:#B83227;--blue:#2754C5;--soft:#EEF2F8;--code:#0F172A;--codet:#E2E8F0;
+--f:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--fc:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;--fm:"IBM Plex Mono",Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535;--code:#0B1020}}
+:root[data-theme="dark"]{--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535;--code:#0B1020}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--text);font:16px/1.6 var(--f)}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--fc);color:var(--ink);line-height:1.15;margin:0}
+h1{font-size:clamp(32px,5.4vw,54px);font-weight:700;max-width:18ch}
+h2{font-size:clamp(24px,3.2vw,32px);font-weight:600;margin-bottom:12px}
+p{margin:0 0 12px;max-width:66ch}
+a{color:var(--blue)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:22px 0;color:var(--muted);font-size:15px}
+.top strong{color:var(--ink)}
+.hero{padding:34px 0 30px}
+.hero p{font-size:18px}
+section{padding:36px 0;border-top:1px solid var(--line)}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px}
+.stepno{color:var(--blue);font-family:var(--fc);font-weight:700;font-size:15px}
+.q{font-family:var(--fc);font-size:26px;color:var(--ink);margin:6px 0 10px}
+pre{background:var(--code);color:var(--codet);font:14px/1.55 var(--fm);padding:14px 16px;border-radius:6px;overflow-x:auto;margin:10px 0 14px}
+.why{font-size:15px;color:var(--muted)}
+.case{border-left:4px solid var(--warn);background:var(--soft);padding:10px 14px;border-radius:4px;font-size:15px;margin:10px 0 14px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button{font:600 15px var(--f);padding:10px 18px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.yes{background:var(--ok);border-color:var(--ok);color:#fff}
+button.no{background:var(--risk);border-color:var(--risk);color:#fff}
+.fix{border:2px solid var(--risk);border-radius:8px;padding:16px;margin-top:6px}
+.done{border:2px solid var(--ok);border-radius:8px;padding:16px;margin-top:6px}
+.trail{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:0;list-style:none}
+.trail li{font-size:13px;padding:4px 10px;border-radius:12px;background:var(--soft);color:var(--muted)}
+.trail li.pass{color:var(--ok)} .trail li.fail{color:var(--risk)}
+ol.all{padding-left:22px}
+ol.all li{margin:10px 0}
+ol.all b{color:var(--ink)}
+footer{padding:30px 0 46px;color:var(--muted);font-size:14px}
+
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft);color:var(--ink);font-weight:600}
+.tbl{overflow-x:auto;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:6px;padding:16px}
+.card h3{font-size:19px;margin-bottom:6px}
+.card p,.card li{font-size:15px}
+.card ul{padding-left:18px;margin:0}
+.note{border-left:4px solid var(--blue);background:var(--soft);padding:10px 14px;border-radius:4px;font-size:15px;margin:12px 0}
+.dl{display:inline-block;margin:4px 0 8px;padding:9px 16px;border-radius:6px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:600;font-size:15px}
+img.shot{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;display:block;margin:12px 0}
+.flow{list-style:none;padding:0;margin:0;counter-reset:f}
+.flow li{position:relative;display:grid;grid-template-columns:44px 1fr;gap:14px;padding:0 0 18px}
+.flow li::before{counter-increment:f;content:counter(f);width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--fc)}
+.flow li.mine::before{background:var(--ok)}
+.flow li::after{content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--line)}
+.flow li:last-child::after{display:none}
+.flow h3{font-size:20px;margin:6px 0 2px}
+.flow .who{display:inline-block;font-size:13px;padding:2px 9px;border-radius:10px;background:var(--soft);color:var(--muted);margin-bottom:4px}
+.flow li.mine .who{color:var(--ok);font-weight:600}
+.flow p{font-size:15px;margin:0}
+.steps{padding-left:22px}.steps li{margin:8px 0}.steps b{color:var(--ink)}
+td select{min-width:110px}
+.hero h1{margin-bottom:18px}
+select,input[type=text]{font:14px var(--f);padding:5px 6px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--text);width:100%}
+.res-Pass{color:var(--ok);font-weight:600}.res-Fail{color:var(--risk);font-weight:600}.res-Partial{color:var(--warn);font-weight:600}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0;font-size:14px}
+.meta div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.meta b{display:block;color:var(--ink)}
+.sum{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.sum span{padding:6px 12px;border-radius:6px;background:var(--card);border:1px solid var(--line);font-size:14px}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.sign>div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px;font-size:14px;min-height:120px}
+.sign .line{border-bottom:1px solid var(--muted);height:26px;margin:4px 0 10px;min-height:0;padding:0;background:none;border-radius:0}
+.preview{position:relative;margin:10px 0 14px}.preview pre{max-height:340px;overflow:hidden;margin:0}.preview.open pre{max-height:none;overflow-x:auto}.preview .fade{position:absolute;left:0;right:0;top:220px;height:120px;background:linear-gradient(rgba(15,23,42,0),var(--code));pointer-events:none}.preview.open .fade{display:none}.preview button{margin-top:8px}
+@media (max-width:820px){.grid3{grid-template-columns:1fr}.meta{grid-template-columns:1fr 1fr}.sign{grid-template-columns:1fr}}
+@media print{.top,.noprint,footer{display:none!important}body{background:#fff;color:#000;font-size:11px}section{border:0;padding:8px 0}select,input{border:0;padding:0;-webkit-appearance:none;appearance:none}th,td{padding:4px 6px}}
+.nav{display:flex;flex-wrap:wrap;gap:6px 16px}.nav a{text-decoration:none}.nav a[aria-current]{color:var(--ink);font-weight:600;text-decoration:underline}</style>
+<!-- Private analytics (GoatCounter). Sign up at goatcounter.com, replace YOURCODE, then remove the comment markers.
+<script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+-->
+</head>
+<body>
+<div class="wrap">
+<header class="top"><span><strong>Mohsin Anwar Sharif</strong></span><nav class="nav" aria-label="Site"><a href="index.html">Home</a><a href="endpoint-control-assurance.html">Case study</a><a href="agent-offline-runbook.html">Runbook</a><a href="control-assessment.html">Assessment</a><a href="agent-scripts.html" aria-current="page">Scripts</a><a href="dsar-erasure-workflow.html">DSAR</a></nav></header>
+<div class="hero"><h1>Endpoint agent scripts</h1><p>Two scripts from my endpoint work: one checks every security agent on a device in one pass, the other let support teams onboard devices to Defender without waiting for us.</p><p class="why">Portfolio reconstructions with placeholder paths. Service patterns are generic; confirm them against your own agent versions.</p></div>
+
+<section>
+<h2>1. Master agent check</h2>
+<p>Checking a device used to mean opening services.msc, then each console in turn. I wrote a batch file that checked SentinelOne, Defender, ManageEngine, Forescout and later Lansweeper in one pass, and a PowerShell check for the Zscaler client. Either could run as local admin or be pushed through the remote-script feature of any of our consoles. This master script combines them and writes every result to an evidence log.</p>
+<div class="tbl"><table><tr><th>Agent</th><th>What it looks for</th><th>Deeper check</th></tr><tr><td><b>SentinelOne</b></td><td>Agent, helper, static engine and log processor services</td><td>Saves the agent's own sentinelctl status report as evidence</td></tr><tr><td><b>Microsoft Defender</b></td><td>WinDefend and Sense (the Defender for Endpoint sensor)</td><td>Running mode (normal or passive), real-time protection, signature age, onboarding state</td></tr><tr><td><b>Zscaler</b></td><td>Client Connector services</td><td>Installed version, whether traffic actually leaves through Zscaler, and which cloud</td></tr><tr><td><b>Trend Micro</b></td><td>Apex One services</td><td>—</td></tr><tr><td><b>ManageEngine</b></td><td>Endpoint Central agent service</td><td>—</td></tr><tr><td><b>Forescout</b></td><td>SecureConnector service</td><td>—</td></tr><tr><td><b>Lansweeper</b></td><td>Lansweeper agent service</td><td>—</td></tr><tr><td><b>DLP agent</b></td><td>Your DLP product's endpoint service</td><td>—</td></tr></table></div>
+<div class="note"><b>Why some agents get deeper checks:</b> a running service is not proof of protection. Defender's services run on devices that were never onboarded, and in passive mode beside another EDR. Zscaler's services can run while the client is suspended and traffic goes straight to the internet.</div>
+<div class="note"><b>On Zscaler:</b> the script I used read the Client Connector's own status: version, online or suspended, and connected cloud. That status is not exposed through a documented command, so this version checks the outcome instead, using Zscaler's public test page to confirm traffic really goes through the cloud.</div>
+<h3>Sample output</h3>
+<p class="why">Fictional device, mid-migration: SentinelOne and Trend Micro are retired, and one agent is installed but stopped.</p>
+<img class="shot" src="assets/master-agent-check-output.png" alt="Script output: five agents pass, Forescout shows a warning because its service is stopped, and SentinelOne and Trend Micro are marked retired.">
+<div class="preview"><pre>&lt;#
+.SYNOPSIS
+  Master endpoint agent check: one pass over every security agent on a
+  Windows device, with deeper checks for Defender, SentinelOne and Zscaler.
+
+.NOTES
+  Portfolio reconstruction. Rebuilt with AI assistance from memory of the
+  scripts I used at a bank; the originals stayed with the employer.
+  Service patterns are generic. Confirm them against your own agent versions.
+  No employer data, hostnames or tokens.
+
+  Run locally as administrator for full detail, or push it through an EDR or
+  management console&#x27;s remote-script feature.
+
+.EXAMPLE
+  .\master-agent-check.ps1 -Retired &#x27;SentinelOne&#x27;,&#x27;Trend Micro&#x27;
+  Agents listed in -Retired are expected to be absent after a migration.
+  If one is still installed, it is flagged for removal.
+
+.EXAMPLE
+  .\master-agent-check.ps1 -SkipNetwork
+  Skips the Zscaler cloud test (for devices with no internet path).
+#&gt;
+param(
+  [string[]]$Retired = @(),
+  [string]$LogFolder = &quot;$env:ProgramData\AgentHealth&quot;,
+  [switch]$SkipNetwork
+)
+
+# Agent -&gt; service patterns, matched against service name or display name.
+$Agents = [ordered]@{
+  &#x27;SentinelOne&#x27;        = &#x27;SentinelAgent&#x27;,&#x27;SentinelHelperService&#x27;,&#x27;SentinelStaticEngine&#x27;,&#x27;LogProcessorService&#x27;
+  &#x27;Microsoft Defender&#x27; = &#x27;WinDefend&#x27;,&#x27;Sense&#x27;
+  &#x27;Trend Micro&#x27;        = &#x27;*Apex One*&#x27;,&#x27;*Trend Micro*&#x27;
+  &#x27;ManageEngine&#x27;       = &#x27;*ManageEngine*Agent*&#x27;
+  &#x27;Forescout&#x27;          = &#x27;*SecureConnector*&#x27;
+  &#x27;Lansweeper&#x27;         = &#x27;*Lansweeper*&#x27;
+  &#x27;Zscaler&#x27;            = &#x27;ZSA*&#x27;,&#x27;*Zscaler*&#x27;
+  &#x27;DLP agent&#x27;          = &#x27;*DLP*&#x27;    # broad pattern: narrow it to your DLP product
+}
+
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+             [Security.Principal.WindowsBuiltInRole]::Administrator)
+$runBy = &quot;$env:USERDOMAIN\$env:USERNAME&quot;
+$stamp = Get-Date -Format &#x27;yyyy-MM-dd HH:mm&#x27;
+$allServices = Get-Service -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Path $LogFolder -Force | Out-Null
+
+function Get-AgentServices([string[]]$Patterns) {
+  $allServices | Where-Object {
+    $svc = $_
+    $Patterns | Where-Object { $svc.Name -like $_ -or $svc.DisplayName -like $_ }
+  } | Sort-Object Name -Unique
+}
+
+function Get-InstalledVersion([string]$NamePattern) {
+  $keys = &#x27;HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*&#x27;,
+          &#x27;HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*&#x27;
+  (Get-ItemProperty $keys -ErrorAction SilentlyContinue |
+    Where-Object DisplayName -like $NamePattern | Select-Object -First 1).DisplayVersion
+}
+
+$results = foreach ($agent in $Agents.Keys) {
+  $svc = @(Get-AgentServices $Agents[$agent])
+
+  # 1. Service layer: installed? running?
+  if ($svc.Count -eq 0) {
+    if ($Retired -contains $agent) { $state = &#x27;Retired&#x27;; $detail = &#x27;Not installed, as expected&#x27; }
+    else                           { $state = &#x27;MISSING&#x27;; $detail = &#x27;No matching service found&#x27; }
+  }
+  else {
+    $running = @($svc | Where-Object Status -eq &#x27;Running&#x27;).Count
+    if ($running -eq $svc.Count) { $state = &#x27;PASS&#x27;; $detail = &quot;$running/$($svc.Count) services running&quot; }
+    else                         { $state = &#x27;WARN&#x27;; $detail = &quot;Installed, $running/$($svc.Count) services running&quot; }
+    if ($Retired -contains $agent) { $state = &#x27;WARN&#x27;; $detail = &quot;Should be removed: $detail&quot; }
+  }
+
+  # 2. Deeper checks where running services are not proof of protection
+  if ($svc.Count -gt 0 -and $Retired -notcontains $agent) {
+    switch ($agent) {
+
+      &#x27;Microsoft Defender&#x27; {
+        # Services run even on devices never onboarded, and in passive mode beside another EDR.
+        try {
+          $mp  = Get-MpComputerStatus -ErrorAction Stop
+          $onb = (Get-ItemProperty &#x27;HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status&#x27; `
+                    -ErrorAction SilentlyContinue).OnboardingState
+          $rtp = if ($mp.RealTimeProtectionEnabled) { &#x27;on&#x27; } else { &#x27;off&#x27; }
+          $mde = if ($onb -eq 1) { &#x27;onboarded&#x27; } else { &#x27;not onboarded&#x27; }
+          $detail = &quot;Mode: $($mp.AMRunningMode) | RTP $rtp | Signatures $($mp.AntivirusSignatureAge) days | MDE $mde&quot;
+          if (-not $mp.RealTimeProtectionEnabled -or $mp.AntivirusSignatureAge -gt 3 -or $onb -ne 1) { $state = &#x27;WARN&#x27; }
+        }
+        catch { $detail += &#x27; | Defender status unavailable: run as administrator&#x27; }
+      }
+
+      &#x27;SentinelOne&#x27; {
+        # Save the agent&#x27;s own status report as evidence for the console team.
+        $ctl = Get-ChildItem &#x27;C:\Program Files\SentinelOne\Sentinel Agent*\SentinelCtl.exe&#x27; -ErrorAction SilentlyContinue |
+               Select-Object -First 1
+        if ($ctl) {
+          $out = Join-Path $LogFolder &quot;sentinelctl-status-$env:COMPUTERNAME.txt&quot;
+          &amp; $ctl.FullName status 2&gt;&amp;1 | Out-File $out
+          $detail += &quot; | sentinelctl status saved&quot;
+        }
+      }
+
+      &#x27;Zscaler&#x27; {
+        # Services running is not the same as traffic going through the cloud.
+        $ver = Get-InstalledVersion &#x27;*Zscaler*&#x27;
+        if ($ver) { $detail = &quot;v$ver | $detail&quot; }
+        if (-not $SkipNetwork) {
+          try {
+            $page = (Invoke-WebRequest &#x27;https://ip.zscaler.com&#x27; -UseBasicParsing -TimeoutSec 10).Content
+            if ($page -match &#x27;via Zscaler&#x27;) {
+              $cloud = if ($page -match &#x27;(zscaler[a-z0-9]*\.net)&#x27;) { $Matches[1] } else { &#x27;cloud not shown&#x27; }
+              $detail += &quot; | traffic via Zscaler | $cloud&quot;
+            }
+            else { $state = &#x27;WARN&#x27;; $detail += &#x27; | traffic NOT via Zscaler (tunnel down or client suspended?)&#x27; }
+          }
+          catch { $state = &#x27;WARN&#x27;; $detail += &#x27; | ip.zscaler.com unreachable&#x27; }
+        }
+      }
+    }
+  }
+
+  [pscustomobject]@{
+    Timestamp = $stamp; Computer = $env:COMPUTERNAME; RunBy = $runBy; Admin = $isAdmin
+    Agent = $agent; State = $state; Detail = $detail
+  }
+}
+
+# Console report
+$colour = @{ PASS = &#x27;Green&#x27;; WARN = &#x27;Yellow&#x27;; MISSING = &#x27;Red&#x27;; Retired = &#x27;DarkGray&#x27; }
+$adminText = if ($isAdmin) { &#x27;Yes&#x27; } else { &#x27;No&#x27; }
+Write-Host &quot;&quot;
+Write-Host &quot;Master agent check | $env:COMPUTERNAME | run by $runBy | admin: $adminText | $stamp&quot;
+Write-Host &quot;&quot;
+Write-Host (&quot;{0,-20}{1,-10}{2}&quot; -f &#x27;Agent&#x27;, &#x27;State&#x27;, &#x27;Detail&#x27;)
+Write-Host (&quot;{0,-20}{1,-10}{2}&quot; -f &#x27;-----&#x27;, &#x27;-----&#x27;, &#x27;------&#x27;)
+foreach ($r in $results) {
+  Write-Host (&quot;{0,-20}&quot; -f $r.Agent) -NoNewline
+  Write-Host (&quot;{0,-10}&quot; -f $r.State) -NoNewline -ForegroundColor $colour[$r.State]
+  Write-Host $r.Detail
+}
+$count = { param($s) @($results | Where-Object State -eq $s).Count }
+Write-Host &quot;&quot;
+Write-Host (&quot;Summary: {0} pass, {1} warning, {2} missing, {3} retired&quot; -f `
+  (&amp; $count &#x27;PASS&#x27;), (&amp; $count &#x27;WARN&#x27;), (&amp; $count &#x27;MISSING&#x27;), (&amp; $count &#x27;Retired&#x27;))
+
+# Evidence log: one row per agent per run
+$log = Join-Path $LogFolder &#x27;agent-health.csv&#x27;
+$results | Export-Csv -Path $log -Append -NoTypeInformation
+Write-Host &quot;Log written: $log&quot;
+</pre><div class="fade"></div><button onclick="this.parentElement.classList.toggle('open');this.textContent=this.parentElement.classList.contains('open')?'Show less':'Show full script'">Show full script</button></div><p><a class="dl" href="master-agent-check.ps1" download>Download master-agent-check.ps1</a></p>
+</section>
+<section id="onboarding">
+<h2>2. Self-service Defender onboarding</h2>
+<p>During the Defender rollout, IT and server support kept asking us for the onboarding script by email or ticket. Instead, I put a wrapper on a shared folder. Anyone could run it, and it recorded who ran it, when, and whether they had local admin rights, so we always knew where onboarding attempts came from.</p>
+<ol class="steps">
+<li><b>Record the attempt.</b> Computer name, user and admin rights go to a shared log before anything runs.</li>
+<li><b>Refuse without admin rights</b>, and log the refusal, so failed attempts are visible too.</li>
+<li><b>Run the onboarding package</b> from the share.</li>
+<li><b>Verify, don't assume.</b> Check that the Sense service is running and the onboarding state is set, then log the outcome.</li>
+</ol>
+<div class="note">The onboarding package itself is tenant-specific, so it is not included. Microsoft's local onboarding script also asks for confirmation when it runs.</div>
+<div class="preview"><pre>@echo off
+setlocal EnableExtensions
+REM ==================================================================
+REM  Self-service Microsoft Defender for Endpoint onboarding wrapper
+REM  Portfolio reconstruction, rebuilt with AI assistance. Not the original.
+REM  Placeholder share path. The real onboarding package is tenant-specific,
+REM  downloaded from the Defender portal, and is NOT included here.
+REM ==================================================================
+set &quot;SHARE=\\fileserver.example.local\DefenderOnboarding&quot;
+set &quot;PKG=%SHARE%\WindowsDefenderATPLocalOnboardingScript.cmd&quot;
+set &quot;LOG=%SHARE%\logs\onboarding-log.csv&quot;
+
+for /f %%t in (&#x27;powershell -NoProfile -Command &quot;Get-Date -Format s&quot;&#x27;) do set &quot;TS=%%t&quot;
+set &quot;WHO=%USERDOMAIN%\%USERNAME%&quot;
+
+REM Who is running this, and with what rights?
+net session &gt;nul 2&gt;&amp;1
+if %errorlevel%==0 (set &quot;ADMIN=Yes&quot;) else (set &quot;ADMIN=No&quot;)
+
+if not exist &quot;%LOG%&quot; echo Timestamp,Computer,RunBy,Admin,Result&gt;&quot;%LOG%&quot;
+
+if &quot;%ADMIN%&quot;==&quot;No&quot; (
+  echo %TS%,%COMPUTERNAME%,%WHO%,No,Refused - not run as administrator&gt;&gt;&quot;%LOG%&quot;
+  echo This must be run as administrator. Your attempt has been logged.
+  pause &amp; exit /b 1
+)
+
+if not exist &quot;%PKG%&quot; (
+  echo %TS%,%COMPUTERNAME%,%WHO%,Yes,Failed - onboarding package not found&gt;&gt;&quot;%LOG%&quot;
+  echo Onboarding package not found. Contact the endpoint security team.
+  pause &amp; exit /b 2
+)
+
+echo %TS%,%COMPUTERNAME%,%WHO%,Yes,Started&gt;&gt;&quot;%LOG%&quot;
+call &quot;%PKG%&quot;
+
+REM Give the sensor time to start, then verify rather than assume
+timeout /t 30 /nobreak &gt;nul
+set &quot;SENSE=Not running&quot;
+sc query Sense | find &quot;RUNNING&quot; &gt;nul &amp;&amp; set &quot;SENSE=Running&quot;
+set &quot;ONBOARDED=No&quot;
+reg query &quot;HKLM\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status&quot; /v OnboardingState 2&gt;nul | find &quot;0x1&quot; &gt;nul &amp;&amp; set &quot;ONBOARDED=Yes&quot;
+
+for /f %%t in (&#x27;powershell -NoProfile -Command &quot;Get-Date -Format s&quot;&#x27;) do set &quot;TS=%%t&quot;
+echo %TS%,%COMPUTERNAME%,%WHO%,Yes,Finished - Sense %SENSE%; onboarded %ONBOARDED%&gt;&gt;&quot;%LOG%&quot;
+echo.
+echo Sense service: %SENSE%
+echo Onboarded:     %ONBOARDED%
+echo Result logged. If Onboarded says No, raise a ticket quoting this computer name.
+pause
+endlocal
+</pre><div class="fade"></div><button onclick="this.parentElement.classList.toggle('open');this.textContent=this.parentElement.classList.contains('open')?'Show less':'Show full script'">Show full script</button></div><p><a class="dl" href="defender-onboarding-wrapper.bat" download>Download defender-onboarding-wrapper.bat</a></p>
+</section>
+<section>
+<h2>How these were made</h2>
+<p>I could not take the originals with me. Both scripts are rebuilt from memory with AI assistance. The value was never the code; it was knowing which checks prove a device is actually protected.</p>
+</section>
+</div>
+<footer><div class="wrap">Everything on this page uses fictional data or placeholders. No employer hostnames, tokens or configuration are published.</div></footer>
+</body>
+</html>

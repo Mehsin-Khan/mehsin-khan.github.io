@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DSAR erasure workflow — Mohsin Anwar Sharif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--text:#2B3445;--muted:#5B6578;--paper:#F6F7F9;--card:#FFFFFF;--line:#D8DDE6;--ok:#1B7F5B;--warn:#B7791F;--risk:#B83227;--blue:#2754C5;--soft:#EEF2F8;--code:#0F172A;--codet:#E2E8F0;
+--f:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--fc:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;--fm:"IBM Plex Mono",Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535;--code:#0B1020}}
+:root[data-theme="dark"]{--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535;--code:#0B1020}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--text);font:16px/1.6 var(--f)}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--fc);color:var(--ink);line-height:1.15;margin:0}
+h1{font-size:clamp(32px,5.4vw,54px);font-weight:700;max-width:18ch}
+h2{font-size:clamp(24px,3.2vw,32px);font-weight:600;margin-bottom:12px}
+p{margin:0 0 12px;max-width:66ch}
+a{color:var(--blue)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:22px 0;color:var(--muted);font-size:15px}
+.top strong{color:var(--ink)}
+.hero{padding:34px 0 30px}
+.hero p{font-size:18px}
+section{padding:36px 0;border-top:1px solid var(--line)}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px}
+.stepno{color:var(--blue);font-family:var(--fc);font-weight:700;font-size:15px}
+.q{font-family:var(--fc);font-size:26px;color:var(--ink);margin:6px 0 10px}
+pre{background:var(--code);color:var(--codet);font:14px/1.55 var(--fm);padding:14px 16px;border-radius:6px;overflow-x:auto;margin:10px 0 14px}
+.why{font-size:15px;color:var(--muted)}
+.case{border-left:4px solid var(--warn);background:var(--soft);padding:10px 14px;border-radius:4px;font-size:15px;margin:10px 0 14px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button{font:600 15px var(--f);padding:10px 18px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.yes{background:var(--ok);border-color:var(--ok);color:#fff}
+button.no{background:var(--risk);border-color:var(--risk);color:#fff}
+.fix{border:2px solid var(--risk);border-radius:8px;padding:16px;margin-top:6px}
+.done{border:2px solid var(--ok);border-radius:8px;padding:16px;margin-top:6px}
+.trail{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:0;list-style:none}
+.trail li{font-size:13px;padding:4px 10px;border-radius:12px;background:var(--soft);color:var(--muted)}
+.trail li.pass{color:var(--ok)} .trail li.fail{color:var(--risk)}
+ol.all{padding-left:22px}
+ol.all li{margin:10px 0}
+ol.all b{color:var(--ink)}
+footer{padding:30px 0 46px;color:var(--muted);font-size:14px}
+
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft);color:var(--ink);font-weight:600}
+.tbl{overflow-x:auto;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:6px;padding:16px}
+.card h3{font-size:19px;margin-bottom:6px}
+.card p,.card li{font-size:15px}
+.card ul{padding-left:18px;margin:0}
+.note{border-left:4px solid var(--blue);background:var(--soft);padding:10px 14px;border-radius:4px;font-size:15px;margin:12px 0}
+.dl{display:inline-block;margin:4px 0 8px;padding:9px 16px;border-radius:6px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:600;font-size:15px}
+img.shot{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;display:block;margin:12px 0}
+.flow{list-style:none;padding:0;margin:0;counter-reset:f}
+.flow li{position:relative;display:grid;grid-template-columns:44px 1fr;gap:14px;padding:0 0 18px}
+.flow li::before{counter-increment:f;content:counter(f);width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--fc)}
+.flow li.mine::before{background:var(--ok)}
+.flow li::after{content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--line)}
+.flow li:last-child::after{display:none}
+.flow h3{font-size:20px;margin:6px 0 2px}
+.flow .who{display:inline-block;font-size:13px;padding:2px 9px;border-radius:10px;background:var(--soft);color:var(--muted);margin-bottom:4px}
+.flow li.mine .who{color:var(--ok);font-weight:600}
+.flow p{font-size:15px;margin:0}
+.steps{padding-left:22px}.steps li{margin:8px 0}.steps b{color:var(--ink)}
+td select{min-width:110px}
+.hero h1{margin-bottom:18px}
+select,input[type=text]{font:14px var(--f);padding:5px 6px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--text);width:100%}
+.res-Pass{color:var(--ok);font-weight:600}.res-Fail{color:var(--risk);font-weight:600}.res-Partial{color:var(--warn);font-weight:600}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0;font-size:14px}
+.meta div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.meta b{display:block;color:var(--ink)}
+.sum{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.sum span{padding:6px 12px;border-radius:6px;background:var(--card);border:1px solid var(--line);font-size:14px}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.sign>div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px;font-size:14px;min-height:120px}
+.sign .line{border-bottom:1px solid var(--muted);height:26px;margin:4px 0 10px;min-height:0;padding:0;background:none;border-radius:0}
+.preview{position:relative;margin:10px 0 14px}.preview pre{max-height:340px;overflow:hidden;margin:0}.preview.open pre{max-height:none;overflow-x:auto}.preview .fade{position:absolute;left:0;right:0;top:220px;height:120px;background:linear-gradient(rgba(15,23,42,0),var(--code));pointer-events:none}.preview.open .fade{display:none}.preview button{margin-top:8px}
+@media (max-width:820px){.grid3{grid-template-columns:1fr}.meta{grid-template-columns:1fr 1fr}.sign{grid-template-columns:1fr}}
+@media print{.top,.noprint,footer{display:none!important}body{background:#fff;color:#000;font-size:11px}section{border:0;padding:8px 0}select,input{border:0;padding:0;-webkit-appearance:none;appearance:none}th,td{padding:4px 6px}}
+.nav{display:flex;flex-wrap:wrap;gap:6px 16px}.nav a{text-decoration:none}.nav a[aria-current]{color:var(--ink);font-weight:600;text-decoration:underline}</style>
+<!-- Private analytics (GoatCounter). Sign up at goatcounter.com, replace YOURCODE, then remove the comment markers.
+<script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+-->
+</head>
+<body>
+<div class="wrap">
+<header class="top"><span><strong>Mohsin Anwar Sharif</strong></span><nav class="nav" aria-label="Site"><a href="index.html">Home</a><a href="endpoint-control-assurance.html">Case study</a><a href="agent-offline-runbook.html">Runbook</a><a href="control-assessment.html">Assessment</a><a href="agent-scripts.html">Scripts</a><a href="dsar-erasure-workflow.html" aria-current="page">DSAR</a></nav></header>
+<div class="hero"><h1>From a deletion request to proof it is gone</h1><p>At the bank, data-subject erasure requests reached me as tickets after department approval. As BigID administrator on the security side, my job was to make sure the data was actually removed, and to prove it.</p></div>
+
+<section>
+<h2>The flow</h2>
+<p class="why">Green steps were mine.</p>
+<ol class="flow"><li class=""><div><h3>Request logged</h3><span class="who">Service desk</span><p>A customer's erasure request arrives through an official channel and becomes a ticket.</p></div></li><li class=""><div><h3>Department approval</h3><span class="who">Business owner</span><p>The owning department confirms the request and the records involved.</p></div></li><li class=""><div><h3>Compliance review</h3><span class="who">Compliance and privacy</span><p>The request is checked before anything is deleted. Records the bank is legally required to keep are excluded.</p></div></li><li class="mine"><div><h3>Locate the data</h3><span class="who">BigID admin: my part</span><p>BigID shows which data sources hold the person's data.</p></div></li><li class="mine"><div><h3>Assign deletion</h3><span class="who">BigID admin: my part</span><p>Each data source owner gets a task on the ticket.</p></div></li><li class=""><div><h3>Delete and prove</h3><span class="who">Database owner</span><p>The owner deletes or anonymises the data and attaches a screenshot as proof.</p></div></li><li class="mine"><div><h3>Verify by rescan</h3><span class="who">BigID admin: my part</span><p>I rerun the BigID scan on those sources to confirm nothing remains.</p></div></li><li class="mine"><div><h3>Close with evidence</h3><span class="who">BigID admin: my part</span><p>A timestamped all-clear screenshot is attached and the ticket closes.</p></div></li></ol>
+</section>
+<section>
+<h2>Why the rescan matters</h2>
+<p>A screenshot from the database owner shows that someone did something. A rescan shows the data is actually gone, including copies in places nobody thought to check. Closing on the rescan, not the screenshot, is what made the evidence hold up.</p>
+<p>For the full privacy operations model, with a record of processing and a DSAR tracker with statutory deadlines, see the <a href="https://github.com/Mehsin-Khan/privacy-operations-ropa-dsar-gdpr-pdpl">privacy operations pack on GitHub</a>.</p>
+</section>
+</div>
+<footer><div class="wrap">Everything on this page uses fictional data or placeholders. No employer hostnames, tokens or configuration are published.</div></footer>
+</body>
+</html>
