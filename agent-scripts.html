@@ -100,7 +100,7 @@ select,input[type=text]{font:14px var(--f);padding:5px 6px;border:1px solid var(
 <div class="note"><b>On Zscaler:</b> the script I used read the Client Connector's own status: version, online or suspended, and connected cloud. That status is not exposed through a documented command, so this version checks the outcome instead, using Zscaler's public test page to confirm traffic really goes through the cloud.</div>
 <h3>Sample output</h3>
 <p class="why">Fictional device, mid-migration: SentinelOne and Trend Micro are retired, and one agent is installed but stopped.</p>
-<img class="shot" src="assets/master-agent-check-output.png" alt="Script output: five agents pass, Forescout shows a warning because its service is stopped, and SentinelOne and Trend Micro are marked retired.">
+<img class="shot" src="assests/master-agent-check-output.png" alt="Script output: five agents pass, Forescout shows a warning because its service is stopped, and SentinelOne and Trend Micro are marked retired.">
 <div class="preview"><pre>&lt;#
 .SYNOPSIS
   Master endpoint agent check: one pass over every security agent on a
