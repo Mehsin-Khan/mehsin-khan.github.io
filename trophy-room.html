@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trophy room — Mohsin Anwar Sharif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--text:#2B3445;--muted:#5B6578;--paper:#F6F7F9;--card:#FFFFFF;--line:#D8DDE6;--ok:#1B7F5B;--warn:#B7791F;--risk:#B83227;--blue:#2754C5;--soft:#EEF2F8;--code:#0F172A;--codet:#E2E8F0;
+--f:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--fc:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;--fm:"IBM Plex Mono",Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535;--code:#0B1020}}
+:root[data-theme="dark"]{--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--warn:#E0A63F;--risk:#E5645A;--blue:#6F95F2;--soft:#1C2535;--code:#0B1020}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--text);font:16px/1.6 var(--f)}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--fc);color:var(--ink);line-height:1.15;margin:0}
+h1{font-size:clamp(32px,5.4vw,54px);font-weight:700;max-width:18ch}
+h2{font-size:clamp(24px,3.2vw,32px);font-weight:600;margin-bottom:12px}
+p{margin:0 0 12px;max-width:66ch}
+a{color:var(--blue)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:22px 0;color:var(--muted);font-size:15px}
+.top strong{color:var(--ink)}
+.hero{padding:34px 0 30px}
+.hero p{font-size:18px}
+section{padding:36px 0;border-top:1px solid var(--line)}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px}
+.stepno{color:var(--blue);font-family:var(--fc);font-weight:700;font-size:15px}
+.q{font-family:var(--fc);font-size:26px;color:var(--ink);margin:6px 0 10px}
+pre{background:var(--code);color:var(--codet);font:14px/1.55 var(--fm);padding:14px 16px;border-radius:6px;overflow-x:auto;margin:10px 0 14px}
+.why{font-size:15px;color:var(--muted)}
+.case{border-left:4px solid var(--warn);background:var(--soft);padding:10px 14px;border-radius:4px;font-size:15px;margin:10px 0 14px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button{font:600 15px var(--f);padding:10px 18px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.yes{background:var(--ok);border-color:var(--ok);color:#fff}
+button.no{background:var(--risk);border-color:var(--risk);color:#fff}
+.fix{border:2px solid var(--risk);border-radius:8px;padding:16px;margin-top:6px}
+.done{border:2px solid var(--ok);border-radius:8px;padding:16px;margin-top:6px}
+.trail{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:0;list-style:none}
+.trail li{font-size:13px;padding:4px 10px;border-radius:12px;background:var(--soft);color:var(--muted)}
+.trail li.pass{color:var(--ok)} .trail li.fail{color:var(--risk)}
+ol.all{padding-left:22px}
+ol.all li{margin:10px 0}
+ol.all b{color:var(--ink)}
+footer{padding:30px 0 46px;color:var(--muted);font-size:14px}
+
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft);color:var(--ink);font-weight:600}
+.tbl{overflow-x:auto;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:6px;padding:16px}
+.card h3{font-size:19px;margin-bottom:6px}
+.card p,.card li{font-size:15px}
+.card ul{padding-left:18px;margin:0}
+.note{border-left:4px solid var(--blue);background:var(--soft);padding:10px 14px;border-radius:4px;font-size:15px;margin:12px 0}
+.dl{display:inline-block;margin:4px 0 8px;padding:9px 16px;border-radius:6px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:600;font-size:15px}
+img.shot{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;display:block;margin:12px 0}
+.flow{list-style:none;padding:0;margin:0;counter-reset:f}
+.flow li{position:relative;display:grid;grid-template-columns:44px 1fr;gap:14px;padding:0 0 18px}
+.flow li::before{counter-increment:f;content:counter(f);width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--fc)}
+.flow li.mine::before{background:var(--ok)}
+.flow li::after{content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--line)}
+.flow li:last-child::after{display:none}
+.flow h3{font-size:20px;margin:6px 0 2px}
+.flow .who{display:inline-block;font-size:13px;padding:2px 9px;border-radius:10px;background:var(--soft);color:var(--muted);margin-bottom:4px}
+.flow li.mine .who{color:var(--ok);font-weight:600}
+.flow p{font-size:15px;margin:0}
+.steps{padding-left:22px}.steps li{margin:8px 0}.steps b{color:var(--ink)}
+td select{min-width:110px}
+.hero h1{margin-bottom:18px}
+select,input[type=text]{font:14px var(--f);padding:5px 6px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--text);width:100%}
+.res-Pass{color:var(--ok);font-weight:600}.res-Fail{color:var(--risk);font-weight:600}.res-Partial{color:var(--warn);font-weight:600}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0;font-size:14px}
+.meta div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.meta b{display:block;color:var(--ink)}
+.sum{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.sum span{padding:6px 12px;border-radius:6px;background:var(--card);border:1px solid var(--line);font-size:14px}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.sign>div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px;font-size:14px;min-height:120px}
+.sign .line{border-bottom:1px solid var(--muted);height:26px;margin:4px 0 10px;min-height:0;padding:0;background:none;border-radius:0}
+.preview{position:relative;margin:10px 0 14px}.preview pre{max-height:340px;overflow:hidden;margin:0}.preview.open pre{max-height:none;overflow-x:auto}.preview .fade{position:absolute;left:0;right:0;top:220px;height:120px;background:linear-gradient(rgba(15,23,42,0),var(--code));pointer-events:none}.preview.open .fade{display:none}.preview button{margin-top:8px}
+@media (max-width:820px){.grid3{grid-template-columns:1fr}.meta{grid-template-columns:1fr 1fr}.sign{grid-template-columns:1fr}}
+@media print{.top,.noprint,footer{display:none!important}body{background:#fff;color:#000;font-size:11px}section{border:0;padding:8px 0}select,input{border:0;padding:0;-webkit-appearance:none;appearance:none}th,td{padding:4px 6px}}
+.nav{display:flex;flex-wrap:wrap;gap:6px 16px}.nav a{text-decoration:none}.nav a[aria-current]{color:var(--ink);font-weight:600;text-decoration:underline}</style><style>
+.stage{height:340vh;position:relative}
+.sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center}
+.scene{position:relative;width:100%;aspect-ratio:1672/941;border-radius:10px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.scene img,.scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pt{font:700 25px Georgia,'Times New Roman',serif}
+.ph{font:700 11px Georgia,serif;fill:#fff;letter-spacing:.3em}
+.pm{font-family:Georgia,serif;font-weight:700;fill:#fff}
+.ps{font:italic 13px/1.35 Georgia,'Times New Roman',serif;color:#5a4030}
+.pi{font:600 14px Georgia,'Times New Roman',serif;fill:#5a4030;letter-spacing:.05em}
+#reel{transition:transform .7s cubic-bezier(.3,1.35,.5,1)}
+#glowE{animation:glow 1.7s ease-in-out infinite alternate}
+@keyframes glow{0%{opacity:.55}40%{opacity:.9}70%{opacity:.65}100%{opacity:1}}
+.certlist{columns:2;gap:24px;padding-left:18px}.certlist li{margin:6px 0;break-inside:avoid}.certlist b{color:var(--ink)}
+.hint{text-align:center;color:var(--muted);font-size:14px;margin-top:8px}
+@media (prefers-reduced-motion:reduce){#glowE{animation:none}#reel{transition:none}}
+@media (max-width:700px){.certlist{columns:1}}
+</style>
+<script data-goatcounter="https://bigdaddy.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<!-- Private analytics (GoatCounter). Sign up at goatcounter.com, replace YOURCODE, then remove the comment markers.
+<script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+-->
+</head>
+<body>
+<div class="wrap">
+<header class="top"><span><strong>Mohsin Anwar Sharif</strong></span><nav class="nav" aria-label="Site"><a href="index.html">Home</a><a href="endpoint-control-assurance.html">Case study</a><a href="agent-offline-runbook.html">Runbook</a><a href="control-assessment.html">Assessment</a><a href="agent-scripts.html">Scripts</a><a href="dsar-erasure-workflow.html">DSAR</a></nav></header>
+<div class="hero"><h1>The trophy room</h1><p>Every portfolio needs one room that is just for the owner. The chair is taken, the tea is hot, and the frame above the mantel holds the real ones.</p></div>
+
+<div class="stage" id="stage"><div class="sticky"><div style="width:100%">
+<div class="scene"><img src="assests/trophy-room-bg.webp" alt="A fire-lit study at night: a man in a red leather wingback chair, seen from behind, smokes a pipe by the fire. A cup of tea steams on the side table. A gilded frame above the mantel shows his certifications." width="1672" height="941"><svg id="fx" viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+<defs>
+<filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<radialGradient id="fire"><stop offset="0" stop-color="#ffb347" stop-opacity=".4"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
+<radialGradient id="vig" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-color="#6b3a12" stop-opacity="0"/><stop offset="1" stop-color="#6b3a12" stop-opacity=".28"/></radialGradient>
+<clipPath id="mclip"><rect x="0" y="0" width="472" height="219"/></clipPath>
+</defs>
+<ellipse id="glowE" cx="920" cy="600" rx="380" ry="230" fill="url(#fire)" style="mix-blend-mode:screen"/>
+<g transform="translate(630,55)" clip-path="url(#mclip)"><g id="reel"><g transform="translate(0,0)">
+<rect x="0" y="0" width="472" height="219" fill="#1f4e8c" opacity=".08"/>
+<rect x="10" y="10" width="452" height="199" fill="none" stroke="#1f4e8c" stroke-width="3"/>
+<rect x="16" y="16" width="440" height="187" fill="none" stroke="#1f4e8c" stroke-width="1" opacity=".6"/>
+<rect x="16" y="16" width="440" height="26" fill="#1f4e8c"/>
+<text x="236.0" y="34" text-anchor="middle" class="ph">CERTIFICATION</text>
+<path d="M78 150 L66 196 L84 186 L94 200 L100 154 Z M122 150 L134 196 L116 186 L106 200 L100 154 Z" fill="#1f4e8c"/>
+<circle cx="100" cy="124" r="46" fill="#d9a441"/><circle cx="100" cy="124" r="40" fill="#1f4e8c"/><circle cx="100" cy="124" r="34" fill="none" stroke="#f3d48a" stroke-width="2" stroke-dasharray="3 3"/>
+<text x="100" y="134.8" text-anchor="middle" class="pm" style="font-size:30px">CISM</text>
+<text x="176" y="96" class="pt" fill="#1f4e8c">CISM</text>
+<foreignObject x="176" y="106" width="272" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="ps">Certified Information Security Manager</div></foreignObject>
+<line x1="176" y1="160" x2="442" y2="160" stroke="#1f4e8c" stroke-width="1.5" opacity=".6"/>
+<text x="176" y="182" class="pi">ISACA · 2026</text>
+</g><g transform="translate(0,219)">
+<rect x="0" y="0" width="472" height="219" fill="#0f766e" opacity=".08"/>
+<rect x="10" y="10" width="452" height="199" fill="none" stroke="#0f766e" stroke-width="3"/>
+<rect x="16" y="16" width="440" height="187" fill="none" stroke="#0f766e" stroke-width="1" opacity=".6"/>
+<rect x="16" y="16" width="440" height="26" fill="#0f766e"/>
+<text x="236.0" y="34" text-anchor="middle" class="ph">CERTIFICATION</text>
+<path d="M78 150 L66 196 L84 186 L94 200 L100 154 Z M122 150 L134 196 L116 186 L106 200 L100 154 Z" fill="#0f766e"/>
+<circle cx="100" cy="124" r="46" fill="#d9a441"/><circle cx="100" cy="124" r="40" fill="#0f766e"/><circle cx="100" cy="124" r="34" fill="none" stroke="#f3d48a" stroke-width="2" stroke-dasharray="3 3"/>
+<text x="100" y="131.92" text-anchor="middle" class="pm" style="font-size:22px">CIPP/E</text>
+<text x="176" y="96" class="pt" fill="#0f766e">CIPP/E</text>
+<foreignObject x="176" y="106" width="272" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="ps">Certified Information Privacy Professional / Europe</div></foreignObject>
+<line x1="176" y1="160" x2="442" y2="160" stroke="#0f766e" stroke-width="1.5" opacity=".6"/>
+<text x="176" y="182" class="pi">IAPP · 2026</text>
+</g><g transform="translate(0,438)">
+<rect x="0" y="0" width="472" height="219" fill="#6b21a8" opacity=".08"/>
+<rect x="10" y="10" width="452" height="199" fill="none" stroke="#6b21a8" stroke-width="3"/>
+<rect x="16" y="16" width="440" height="187" fill="none" stroke="#6b21a8" stroke-width="1" opacity=".6"/>
+<rect x="16" y="16" width="440" height="26" fill="#6b21a8"/>
+<text x="236.0" y="34" text-anchor="middle" class="ph">CERTIFICATION</text>
+<path d="M78 150 L66 196 L84 186 L94 200 L100 154 Z M122 150 L134 196 L116 186 L106 200 L100 154 Z" fill="#6b21a8"/>
+<circle cx="100" cy="124" r="46" fill="#d9a441"/><circle cx="100" cy="124" r="40" fill="#6b21a8"/><circle cx="100" cy="124" r="34" fill="none" stroke="#f3d48a" stroke-width="2" stroke-dasharray="3 3"/>
+<text x="100" y="134.8" text-anchor="middle" class="pm" style="font-size:30px">ISO</text>
+<text x="176" y="96" class="pt" fill="#6b21a8">ISO/IEC 27001 Lead Auditor</text>
+<foreignObject x="176" y="106" width="272" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="ps">Information security management systems</div></foreignObject>
+<line x1="176" y1="160" x2="442" y2="160" stroke="#6b21a8" stroke-width="1.5" opacity=".6"/>
+<text x="176" y="182" class="pi">Mastermind Assurance · 2025</text>
+</g><g transform="translate(0,657)">
+<rect x="0" y="0" width="472" height="219" fill="#15803d" opacity=".08"/>
+<rect x="10" y="10" width="452" height="199" fill="none" stroke="#15803d" stroke-width="3"/>
+<rect x="16" y="16" width="440" height="187" fill="none" stroke="#15803d" stroke-width="1" opacity=".6"/>
+<rect x="16" y="16" width="440" height="26" fill="#15803d"/>
+<text x="236.0" y="34" text-anchor="middle" class="ph">CERTIFICATION</text>
+<path d="M78 150 L66 196 L84 186 L94 200 L100 154 Z M122 150 L134 196 L116 186 L106 200 L100 154 Z" fill="#15803d"/>
+<circle cx="100" cy="124" r="46" fill="#d9a441"/><circle cx="100" cy="124" r="40" fill="#15803d"/><circle cx="100" cy="124" r="34" fill="none" stroke="#f3d48a" stroke-width="2" stroke-dasharray="3 3"/>
+<text x="100" y="134.8" text-anchor="middle" class="pm" style="font-size:30px">GRCP</text>
+<text x="176" y="96" class="pt" fill="#15803d">GRCP</text>
+<foreignObject x="176" y="106" width="272" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="ps">Certified GRC Professional</div></foreignObject>
+<line x1="176" y1="160" x2="442" y2="160" stroke="#15803d" stroke-width="1.5" opacity=".6"/>
+<text x="176" y="182" class="pi">OCEG · 2026</text>
+</g><g transform="translate(0,876)">
+<rect x="0" y="0" width="472" height="219" fill="#c2410c" opacity=".08"/>
+<rect x="10" y="10" width="452" height="199" fill="none" stroke="#c2410c" stroke-width="3"/>
+<rect x="16" y="16" width="440" height="187" fill="none" stroke="#c2410c" stroke-width="1" opacity=".6"/>
+<rect x="16" y="16" width="440" height="26" fill="#c2410c"/>
+<text x="236.0" y="34" text-anchor="middle" class="ph">CERTIFICATION</text>
+<path d="M78 150 L66 196 L84 186 L94 200 L100 154 Z M122 150 L134 196 L116 186 L106 200 L100 154 Z" fill="#c2410c"/>
+<circle cx="100" cy="124" r="46" fill="#d9a441"/><circle cx="100" cy="124" r="40" fill="#c2410c"/><circle cx="100" cy="124" r="34" fill="none" stroke="#f3d48a" stroke-width="2" stroke-dasharray="3 3"/>
+<text x="100" y="134.8" text-anchor="middle" class="pm" style="font-size:30px">IAIP</text>
+<text x="176" y="96" class="pt" fill="#c2410c">IAIP</text>
+<foreignObject x="176" y="106" width="272" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="ps">Certified Integrated AI Professional</div></foreignObject>
+<line x1="176" y1="160" x2="442" y2="160" stroke="#c2410c" stroke-width="1.5" opacity=".6"/>
+<text x="176" y="182" class="pi">OCEG · 2026</text>
+</g><g transform="translate(0,1095)">
+<rect x="0" y="0" width="472" height="219" fill="#b91c1c" opacity=".08"/>
+<rect x="10" y="10" width="452" height="199" fill="none" stroke="#b91c1c" stroke-width="3"/>
+<rect x="16" y="16" width="440" height="187" fill="none" stroke="#b91c1c" stroke-width="1" opacity=".6"/>
+<rect x="16" y="16" width="440" height="26" fill="#b91c1c"/>
+<text x="236.0" y="34" text-anchor="middle" class="ph">CERTIFICATION</text>
+<path d="M78 150 L66 196 L84 186 L94 200 L100 154 Z M122 150 L134 196 L116 186 L106 200 L100 154 Z" fill="#b91c1c"/>
+<circle cx="100" cy="124" r="46" fill="#d9a441"/><circle cx="100" cy="124" r="40" fill="#b91c1c"/><circle cx="100" cy="124" r="34" fill="none" stroke="#f3d48a" stroke-width="2" stroke-dasharray="3 3"/>
+<text x="100" y="134.8" text-anchor="middle" class="pm" style="font-size:30px">×7</text>
+<text x="176" y="96" class="pt" fill="#b91c1c">Qualys Certified Specialist ×7</text>
+<foreignObject x="176" y="106" width="272" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="ps">VMDR · EDR · PCI · TruRisk · CSAM · Cloud Agent · TotalCloud</div></foreignObject>
+<line x1="176" y1="160" x2="442" y2="160" stroke="#b91c1c" stroke-width="1.5" opacity=".6"/>
+<text x="176" y="182" class="pi">Qualys · 2026</text>
+</g><g transform="translate(0,1314)">
+<rect x="0" y="0" width="472" height="219" fill="#0369a1" opacity=".08"/>
+<rect x="10" y="10" width="452" height="199" fill="none" stroke="#0369a1" stroke-width="3"/>
+<rect x="16" y="16" width="440" height="187" fill="none" stroke="#0369a1" stroke-width="1" opacity=".6"/>
+<rect x="16" y="16" width="440" height="26" fill="#0369a1"/>
+<text x="236.0" y="34" text-anchor="middle" class="ph">CERTIFICATION</text>
+<path d="M78 150 L66 196 L84 186 L94 200 L100 154 Z M122 150 L134 196 L116 186 L106 200 L100 154 Z" fill="#0369a1"/>
+<circle cx="100" cy="124" r="46" fill="#d9a441"/><circle cx="100" cy="124" r="40" fill="#0369a1"/><circle cx="100" cy="124" r="34" fill="none" stroke="#f3d48a" stroke-width="2" stroke-dasharray="3 3"/>
+<text x="100" y="134.8" text-anchor="middle" class="pm" style="font-size:30px">AI</text>
+<text x="176" y="96" class="pt" fill="#0369a1">AI Security &amp; Governance</text>
+<foreignObject x="176" y="106" width="272" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="ps">Certificate of completion</div></foreignObject>
+<line x1="176" y1="160" x2="442" y2="160" stroke="#0369a1" stroke-width="1.5" opacity=".6"/>
+<text x="176" y="182" class="pi">Securiti · 2025</text>
+</g></g></g>
+<rect x="630" y="55" width="472" height="219" fill="url(#vig)" pointer-events="none"/>
+<g id="smoke" filter="url(#blur)"></g>
+</svg></div>
+<p class="hint">Scroll to turn through the frame above the mantel.</p></div></div></div>
+<section>
+<h2>What hangs on the wall</h2>
+<ul class="certlist"><li><b>CISM</b>: Certified Information Security Manager. ISACA, 2026.</li><li><b>CIPP/E</b>: Certified Information Privacy Professional / Europe. IAPP, 2026.</li><li><b>ISO/IEC 27001 Lead Auditor</b>: Information security management systems. Mastermind Assurance, 2025.</li><li><b>GRCP</b>: Certified GRC Professional. OCEG, 2026.</li><li><b>IAIP</b>: Certified Integrated AI Professional. OCEG, 2026.</li><li><b>Qualys Certified Specialist ×7</b>: VMDR · EDR · PCI · TruRisk · CSAM · Cloud Agent · TotalCloud. Qualys, 2026.</li><li><b>AI Security &amp; Governance</b>: Certificate of completion. Securiti, 2025.</li></ul>
+<p class="why">The room is illustrated; the credentials are real. Verification links are available on request.</p>
+</section>
+<script>
+(function(){
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reel=document.getElementById('reel'),stage=document.getElementById('stage'),N=7,PH=219;
+function onScroll(){const r=stage.getBoundingClientRect();const total=stage.offsetHeight-innerHeight;const p=Math.min(1,Math.max(0,-r.top/total));const i=Math.round(p*(N-1));reel.style.transform='translateY('+(-i*PH)+'px)';}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+if(reduce)return;
+const smoke=document.getElementById('smoke'),NS='http://www.w3.org/2000/svg';
+function puff(x,y,r,dx,dy,dur,op,col){const c=document.createElementNS(NS,'circle');c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',r);c.setAttribute('fill',col||'#e6e1d8');c.style.transformBox='fill-box';c.style.transformOrigin='center';smoke.appendChild(c);
+c.animate([{transform:'translate(0,0) scale(1)',opacity:0},{opacity:op,offset:.15},{transform:'translate('+dx+'px,'+dy+'px) scale(4)',opacity:0}],{duration:dur,easing:'ease-out'}).onfinish=()=>c.remove();}
+setInterval(()=>puff(858+Math.random()*6,588,5,(Math.random()*44-14),-200-Math.random()*50,4200,.5),300);
+setInterval(()=>puff(1146+Math.random()*16,664,5,(Math.random()*24-12),-120-Math.random()*30,3400,.45),420);
+function exhale(){for(let i=0;i<10;i++)setTimeout(()=>puff(500+Math.random()*60,352+Math.random()*14,12,(Math.random()*70-10),-150-Math.random()*50,3400,.42),i*80);setTimeout(exhale,7000+Math.random()*9000);}
+setTimeout(exhale,3500);
+})();
+</script>
+</div>
+<footer><div class="wrap">Everything on this page uses fictional data or placeholders. No employer hostnames, tokens or configuration are published.</div></footer>
+</body>
+</html>
