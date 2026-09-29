@@ -217,7 +217,7 @@ select,input[type=text]{font:14px var(--f);padding:5px 6px;border:1px solid var(
 (function(){
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const reel=document.getElementById('reel'),stage=document.getElementById('stage'),N=7,PH=219;
-function onScroll(){const r=stage.getBoundingClientRect();const total=stage.offsetHeight-innerHeight;const p=Math.min(1,Math.max(0,-r.top/total));const i=Math.round(p*(N-1));reel.style.transform='translateY('+(-i*PH)+'px)';}
+function onScroll(){const r=stage.getBoundingClientRect();const total=stage.offsetHeight-innerHeight;const p=Math.min(1,Math.max(0,-r.top/total));const i=Math.min(N-1,Math.floor(p*N));reel.style.transform='translateY('+(-i*PH)+'px)';}
 addEventListener('scroll',onScroll,{passive:true});onScroll();
 if(reduce)return;
 const smoke=document.getElementById('smoke'),NS='http://www.w3.org/2000/svg';
