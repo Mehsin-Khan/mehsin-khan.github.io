@@ -201,10 +201,10 @@ footer{padding-block:30px 46px;color:var(--muted);font-size:14px;border-top:1px 
 <article id="p2" aria-labelledby="p2h">
 <div class="head"><span class="eyebrow">02 · Web and egress</span><h2 id="p2h">Blue Coat proxy to Zscaler ZIA</h2>
 <div class="meta"><span class="role ops">Security ops lead</span><span>Then ZIA policy, SSL inspection and blocklist administrator</span></div></div>
-<p class="lede">The on-premises Blue Coat proxy only protected people sitting on the bank network. Remote work meant users needed the same filtering wherever they were, so internet access moved to Zscaler Internet Access, a cloud proxy reached through an agent on each device.</p>
+<p class="lede">The on-premises Blue Coat proxy only protected people sitting on the bank network, and it was being withdrawn, so the deadline was fixed. Losing web filtering in a bank was not an option. Internet access moved to Zscaler Internet Access, a cloud proxy reached through an agent on each device.</p>
 <figure class="fig"><div data-d="p2"></div><figcaption>One policy for office and remote users. Destinations that cannot survive inspection go direct, each with an owner.</figcaption></figure>
 <div class="tbl"><table><thead><tr><th>Decision</th><th>We chose</th><th>Because</th></tr></thead><tbody>
-<tr><td>Big-bang switch or parallel run</td><td>Parallel run, moved group by group</td><td>Any group could go back to Blue Coat while issues were fixed.</td></tr>
+<tr><td>Big bang or staged under a deadline</td><td>Staged: a 50-device control group, then about 800 hand-picked users across every entity, then the rest</td><td>The 800 covered every country, department and application mix, so the working model was proven everywhere before the bulk moved. Blue Coat stayed in place for anyone not yet moved.</td></tr>
 <tr><td>Inspect everything or bypass broadly</td><td>Inspect by default, with an approved bypass list</td><td>Each bypass needed a business owner and a reason, so the list could not quietly become a hole.</td></tr>
 <tr><td>Roll a user back or relax one rule</td><td>Relax one rule for one group, fix, then restore</td><td>The business kept working and no exception became permanent.</td></tr>
 <tr><td>New joiners on old or new proxy</td><td>Straight to Zscaler</td><td>A new-hire access group stopped the old proxy's population growing.</td></tr>
@@ -217,10 +217,10 @@ footer{padding-block:30px 46px;color:var(--muted);font-size:14px;border-top:1px 
 <li>Market data feeds, log transfers and in-house applications that broke under inspection were each fixed with a tested, owned bypass.</li>
 <li>Web logs streamed to the SIEM for investigations and audit evidence.</li>
 </ul></div>
-<div><span class="lbl">Gates passed</span><ul class="chips"><li>Pilot with IT and security staff</li><li>Application test per department</li><li>CAB per user group</li><li>Bypass approvals by owner</li><li>Blue Coat decommission record</li></ul>
+<div><span class="lbl">Gates passed</span><ul class="chips"><li>50-device control group in Bahrain</li><li>800 users across all entities</li><li>Application test per department</li><li>CAB per user group</li><li>Bypass approvals by owner</li><li>Blue Coat decommission record</li></ul>
 <div class="proof"><b>Blue Coat was switched off when</b> no user traffic had reached it for an agreed period, no critical tickets were open, and block pages, DLP tests and SIEM log search all worked from Zscaler.</div></div>
 </div>
-<div class="minute"><span class="who">In one minute</span><p>We moved internet access from an on-premises proxy to Zscaler so remote users got the same protection as office users. Both ran in parallel and we moved by group. The real work was the breakages: data feeds, log transfers and in-house apps that failed under SSL inspection. Each got an owned, approved bypass instead of a blanket exception. When the first large wave of about 800 users raised critical tickets, I relaxed one rule for one group, fixed it and put it back, so the business never stopped and no hole stayed open.</p></div>
+<div class="minute"><span class="who">In one minute</span><p>Blue Coat was being withdrawn, so we had a fixed deadline and couldn't leave the bank without web filtering. We started with a 50-device control group in Bahrain, then about 800 hand-picked users across every entity, from Bahrain to the UK, so every country and application mix was tested before the bulk moved. The real work was the breakages: data feeds, log transfers and in-house apps that failed under SSL inspection. Each got an owned, approved bypass instead of a blanket exception. When the 800 raised critical tickets, I relaxed one rule for one group, fixed it and put it back, so the business never stopped and no hole stayed open.</p></div>
 </article>
 
 <!-- 03 -->
@@ -402,7 +402,7 @@ footer{padding-block:30px 46px;color:var(--muted);font-size:14px;border-top:1px 
 <p>Every platform here went in by phased waves or a parallel run, never big bang. A security agent touches every device, so a bad setting in a big bang breaks the whole estate at once and leaves no healthy group to compare against. Agile suited the reporting work, which improved in short cycles, but not production rollouts, which need fixed CAB windows.</p>
 <div class="tbl"><table><thead><tr><th>Project</th><th>Model</th></tr></thead><tbody>
 <tr><td>SentinelOne to cloud</td><td>Waves by device type</td></tr>
-<tr><td>Zscaler</td><td>Parallel run, moved by user group</td></tr>
+<tr><td>Zscaler</td><td>Control group of 50, then 800 across all entities, then the rest; fixed deadline</td></tr>
 <tr><td>Defender</td><td>Waves, headquarters first, then entity by entity</td></tr>
 <tr><td>BigID</td><td>Source by source</td></tr>
 <tr><td>Darktrace</td><td>Segment by segment, passive</td></tr>
