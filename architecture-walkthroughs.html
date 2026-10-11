@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Architecture Walkthroughs — Mohsin Anwar Sharif</title>
+<meta name="description" content="Nine security projects in a regulated bank: design, decisions, build, approval gates and proof.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* Layout: the portfolio's own system (IBM Plex, navy ink, one blue accent). One project on screen at a time,
+   picked from a bar; its live diagram leads, details sit behind tabs. Lifecycle below as a clickable track. */
+:root{--ink:#14213D;--text:#2B3445;--muted:#5B6578;--paper:#F6F7F9;--card:#FFFFFF;--line:#D8DDE6;--ok:#1B7F5B;--blue:#2754C5;--soft:#EEF2F8;--tint:rgba(39,84,197,.09);--glow:rgba(39,84,197,.28);
+--f:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--fc:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;--fm:"IBM Plex Mono",Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--blue:#6F95F2;--soft:#1C2535;--tint:rgba(111,149,242,.14);--glow:rgba(111,149,242,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--ink:#E8EDF7;--text:#CDD5E3;--muted:#98A3B8;--paper:#10151F;--card:#171E2B;--line:#2A3445;--ok:#3DBB8A;--blue:#6F95F2;--soft:#1C2535;--tint:rgba(111,149,242,.14);--glow:rgba(111,149,242,.35);color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--text);font:16px/1.6 var(--f)}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--fc);color:var(--ink);line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(30px,5vw,46px);font-weight:700;max-width:22ch}
+h2{font-size:clamp(24px,3.2vw,30px);font-weight:600}
+h3{font-size:19px;font-weight:600}
+p{margin:0;max-width:68ch}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+.top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-block:22px;color:var(--muted);font-size:15px}
+.top strong{color:var(--ink)}
+.nav{display:flex;flex-wrap:wrap;gap:4px 16px}
+.nav a{color:var(--muted);text-decoration:none}.nav a:hover,.nav a[aria-current]{color:var(--ink)}
+.hero{display:grid;gap:14px;padding-block:22px 28px}
+.hero p{font-size:17.5px}
+.hero .small{font-size:14px;color:var(--muted)}
+.eyebrow{font:600 13px var(--fc);letter-spacing:.06em;text-transform:uppercase;color:var(--blue)}
+.lbl{font:600 13px var(--fc);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.legend{font-size:13px;color:var(--muted)}
+
+/* project picker */
+.picker{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:10px;border-block:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+.pick{flex:1 0 96px;display:grid;gap:2px;text-align:left;padding:8px 10px;border-radius:8px;border:1px solid transparent;transition:background .2s,border-color .2s}
+.pick:hover{background:var(--soft)}
+.pick[aria-selected="true"]{background:var(--card);border-color:var(--blue);box-shadow:0 2px 10px var(--glow)}
+.pick .n{font:12px var(--fm);color:var(--muted);display:flex;align-items:center;gap:6px}
+.pick .t{font:600 14px/1.2 var(--fc);color:var(--ink)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dot.led{background:var(--blue)} .dot.ops{border:2px solid var(--blue);background:transparent}
+.keys{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);padding-block:10px 0}
+.keys span{display:inline-flex;align-items:center;gap:6px}
+
+/* project */
+.proj{display:grid;gap:16px;padding-block:28px 40px;scroll-margin-top:110px}
+.proj>*,.life>*,.tabset,.pane>*,.hero>*{min-width:0}
+main,.wrap{min-width:0}
+.proj[hidden]{display:none}
+.proj.enter>*{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+.proj.enter>*:nth-child(2){animation-delay:.05s}.proj.enter>*:nth-child(3){animation-delay:.1s}.proj.enter>*:nth-child(4){animation-delay:.15s}
+@keyframes rise{from{opacity:.15;transform:translateY(8px)}to{opacity:1;transform:none}}
+.head{display:grid;gap:6px}
+.head .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
+.role{font:600 12px var(--f);padding:2px 9px;border-radius:10px;white-space:nowrap;background:var(--soft);color:var(--muted)}
+.role.led{background:var(--blue);color:var(--card)}
+.role.ops{border:1px solid var(--blue);color:var(--blue);background:transparent}
+.lede{font-size:16.5px}
+figure{margin:0}
+.fig{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;overflow-x:auto}
+.fig svg{display:block;width:100%;min-width:620px;height:auto}
+.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fig figcaption .hint{font-size:12.5px}
+
+/* diagram */
+svg .node{cursor:default;transition:opacity .25s}
+svg .node .box{fill:var(--card);stroke:var(--line);stroke-width:1.25;transition:stroke .2s,filter .2s}
+svg .node.core .box{fill:var(--tint);stroke:var(--blue);stroke-width:2}
+svg .node.ext .box{stroke-dasharray:5 4;stroke:var(--muted)}
+svg .node.on .box{stroke:var(--blue);stroke-width:2;filter:drop-shadow(0 3px 8px var(--glow))}
+svg .zone{fill:var(--soft);stroke:var(--line)}
+svg .ztx{fill:var(--muted);font:600 11.5px var(--fc);letter-spacing:.05em;text-transform:uppercase}
+svg .bt{fill:var(--ink);font:600 14px var(--fc)}
+svg .bl{fill:var(--muted);font:12px var(--f)}
+svg .core .bl{fill:var(--text)}
+svg .edge{fill:none;stroke:var(--muted);stroke-width:1.25;transition:opacity .25s,stroke .2s}
+svg .edge.dash{stroke-dasharray:4 4}
+svg .edge.on{stroke:var(--blue);stroke-width:2}
+svg .et{fill:var(--muted);font:11.5px var(--f);transition:opacity .25s}
+svg .ah{fill:var(--muted)}
+svg .pulse{fill:var(--blue)}
+svg .halo{fill:var(--blue);opacity:.18}
+svg.hl .node:not(.on){opacity:.35}
+svg.hl .edge:not(.on),svg.hl .et:not(.on),svg.hl .pk:not(.on){opacity:.15}
+svg.live .node{animation:pop .45s cubic-bezier(.2,.8,.2,1.2) both;animation-delay:calc(var(--i)*90ms)}
+svg.live .edge:not(.dash){stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw .6s ease-out forwards;animation-delay:calc(450ms + var(--i)*110ms)}
+svg.live .core .box{animation:breathe 3.2s ease-in-out 1.2s infinite}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes breathe{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 10px var(--glow))}}
+svg .node{transform-box:fill-box;transform-origin:center}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{padding:9px 14px;font:600 15px var(--fc);color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--blue)}
+.pane{padding-top:16px;display:grid;gap:14px}
+.pane[hidden]{display:none}
+.pane.enter,.stage-card.enter{animation:rise .35s ease both}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{background:var(--soft);color:var(--ink);font-weight:600;white-space:nowrap}
+td:first-child{color:var(--ink);font-weight:500}
+td.c{text-align:center;font:600 13px var(--fm);color:var(--muted);white-space:nowrap;font-weight:600}
+td.c.r{color:var(--blue)} td.c.a{color:var(--ink)}
+col.me,td.me{background:var(--tint)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.two>div{min-width:0;display:grid;gap:10px;align-content:start}
+ul.b{margin:0;padding-left:20px;display:grid;gap:7px;font-size:15px}
+code{font:13px var(--fm);background:var(--soft);padding:1px 5px;border-radius:3px;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.chips li{font-size:13px;padding:3px 10px;border-radius:12px;background:var(--soft);color:var(--text)}
+.proof{border-left:4px solid var(--ok);background:var(--soft);padding:10px 14px;border-radius:4px;font-size:15px}
+.proof b{color:var(--ink)}
+.minute{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;gap:8px}
+.minute p{font-size:16.5px;line-height:1.65;max-width:none}
+.minute .who{font:600 13px var(--fc);letter-spacing:.05em;text-transform:uppercase;color:var(--blue)}
+
+/* lifecycle */
+.life{border-top:1px solid var(--line);padding-block:40px;display:grid;gap:18px}
+.track{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;padding-top:6px}
+.track::before{content:"";position:absolute;left:4%;right:4%;top:24px;height:2px;background:var(--line)}
+.runner{position:absolute;top:19px;left:4%;width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 6px var(--glow);animation:run 9s linear infinite}
+@keyframes run{0%{left:4%;opacity:0}6%{opacity:1}92%{opacity:1}100%{left:calc(96% - 12px);opacity:0}}
+.step{position:relative;display:grid;justify-items:center;gap:8px;text-align:center;padding:4px 2px}
+.step .num{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:2px solid var(--line);font:600 15px var(--fc);color:var(--muted);transition:all .2s;position:relative;z-index:1}
+.step .nm{font:600 13px/1.25 var(--fc);color:var(--muted)}
+.step:hover .num{border-color:var(--blue);color:var(--blue)}
+.step[aria-selected="true"] .num{background:var(--blue);border-color:var(--blue);color:var(--card);box-shadow:0 0 0 6px var(--glow)}
+.step[aria-selected="true"] .nm{color:var(--ink)}
+.stage-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;gap:8px}
+.stage-card .rec{font-size:14px;color:var(--muted)}.stage-card .rec b{color:var(--ink)}
+footer{padding-block:30px 46px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+@media (max-width:820px){.two{grid-template-columns:1fr}.track{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:14px}.track::before,.runner{display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}svg .pk,.runner{display:none}svg.live .edge:not(.dash){stroke-dasharray:none;stroke-dashoffset:0}}
+</style>
+<script data-goatcounter="https://bigdaddy.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><span><strong>Mohsin Anwar Sharif</strong></span><nav class="nav" aria-label="Site"><a href="index.html">Home</a><a href="endpoint-control-assurance.html">Case study</a><a href="architecture-walkthroughs.html" aria-current="page">Architecture</a><a href="agent-offline-runbook.html">Runbook</a><a href="control-assessment.html">Assessment</a><a href="agent-scripts.html">Scripts</a><a href="dsar-erasure-workflow.html">DSAR</a><a href="trophy-room.html">Trophy room</a></nav></header>
+
+<div class="hero">
+<span class="eyebrow">Architecture walkthroughs</span>
+<h1>Nine security projects, from proof of concept to signed-off production.</h1>
+<p>Six years in a regulated bank across seven countries, as its estate grew from about 8,000 endpoints to about 18,000 assets. Pick a project to see how it was designed, the options we turned down, how it was built and how we proved it worked.</p>
+<p class="small">Written from my own experience with no employer documents. The bank is not named, and anything an attacker could use has been left out. Ports and URLs are vendor-standard values.</p>
+</div>
+
+<div class="picker" role="tablist" aria-label="Projects">
+<button class="pick" role="tab" data-p="p1"><span class="n"><i class="dot led"></i>01</span><span class="t">SentinelOne to cloud</span></button>
+<button class="pick" role="tab" data-p="p2"><span class="n"><i class="dot ops"></i>02</span><span class="t">Blue Coat to Zscaler</span></button>
+<button class="pick" role="tab" data-p="p3"><span class="n"><i class="dot led"></i>03</span><span class="t">Defender, Intune, Entra</span></button>
+<button class="pick" role="tab" data-p="p4"><span class="n"><i class="dot ops"></i>04</span><span class="t">BigID discovery</span></button>
+<button class="pick" role="tab" data-p="p5"><span class="n"><i class="dot ops"></i>05</span><span class="t">Darktrace NDR</span></button>
+<button class="pick" role="tab" data-p="p6"><span class="n"><i class="dot"></i>06</span><span class="t">Lansweeper agent</span></button>
+<button class="pick" role="tab" data-p="p7"><span class="n"><i class="dot"></i>07</span><span class="t">Security baseline</span></button>
+<button class="pick" role="tab" data-p="p8"><span class="n"><i class="dot"></i>08</span><span class="t">DR exercises</span></button>
+<button class="pick" role="tab" data-p="p9"><span class="n"><i class="dot led"></i>09</span><span class="t">CISO reporting</span></button>
+</div>
+<div class="keys"><span><i class="dot led"></i>Led: I owned delivery</span><span><i class="dot ops"></i>Security ops lead: vendor or another team built it</span><span><i class="dot"></i>Supported: a defined part, named inside</span></div>
+
+<main id="projects">
+<!-- 01 -->
+<article id="p1" aria-labelledby="p1h">
+<div class="head"><span class="eyebrow">01 · Endpoint protection</span><h2 id="p1h">SentinelOne on-premises to cloud</h2>
+<div class="meta"><span class="role led">Led</span><span>Primary SentinelOne administrator · first security product the bank moved to the cloud</span></div></div>
+<p class="lede">Running our own console meant owning its upgrades, its operating system and its certificates, and an expired certificate once took a whole entity's agents offline. Moving management to the vendor's cloud removed that work, but no security product had left the data centre before, so the regulator had to approve where its data lived.</p>
+<figure class="fig"><div data-d="p1"></div><figcaption>Agents were moved to the cloud tenant in waves. The on-premises console stayed live as the rollback path until the last wave closed.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Decision</th><th>We chose</th><th>Because</th></tr></thead><tbody>
+<tr><td>Regulator first or build first</td><td>Regulator first</td><td>Approval on data retention, metadata and deletion had to exist before any agent moved. I collected the vendor's answers and wrote the case.</td></tr>
+<tr><td>Fresh policy build or replicate</td><td>Replicate every policy, exclusion and blocklist entry</td><td>Protection must be identical the moment a device changes console.</td></tr>
+<tr><td>Cut over or keep a fallback</td><td>Keep the on-premises console live</td><td>A rollback is only real while the old service, licences and access still exist.</td></tr>
+<tr><td>Every entity or regulated scope</td><td>Two entities stayed on-premises</td><td>Their local regulation did not allow the move.</td></tr>
+</tbody></table></div>
+<div class="two">
+<div><span class="lbl">How it was built</span><ul class="b">
+<li>Tenant laid out as one site per entity, with groups by device type, so each country had delegated administration and inherited policy.</li>
+<li>Agents talk to the tenant on <code>TCP 443</code>. The web proxy bypasses inspection for the vendor domain.</li>
+<li>Waves: IT users, then departments, then the VDI (Virtual Desktop Infrastructure) gold image, then test servers, then production servers in planned outage windows.</li>
+<li>Each agent release was tested first on laptops, VMs and cloned production servers, with threat and CPU-load tests.</li>
+<li>Administrators sign in with role-based access. Reporting reads the console through a read-only API (Application Programming Interface) token.</li>
+<li>Before migration: on-premises console backed up, and the cloud retention period checked against the bank's requirement, with longer-term logs kept in the SIEM.</li>
+</ul></div>
+<div><span class="lbl">Gates passed</span><ul class="chips"><li>Vendor data questionnaire</li><li>Risk committee</li><li>Central bank approval</li><li>CAB per wave</li><li>On-prem retirement record</li></ul>
+<div class="proof"><b>A wave closed when</b> every device in it was online in the cloud console on the right policy, a test detection reached the SIEM (Security Information and Event Management), and no device was left on the old console without a ticket.</div></div>
+</div>
+<div class="minute"><span class="who">In one minute</span><p>It was the bank's first security product in the cloud, so the hard part was the approval, not the technology. I gathered the vendor's answers on retention, metadata and deletion, wrote the case for the central bank and presented the benefits against the risks to CAB and the risk committee. Technically, we replicated every policy before moving a single agent, moved in waves with servers only in outage windows, and kept the old console alive as rollback until the last wave closed.</p></div>
+</article>
+
+<!-- 02 -->
+<article id="p2" aria-labelledby="p2h">
+<div class="head"><span class="eyebrow">02 · Web and egress</span><h2 id="p2h">Blue Coat proxy to Zscaler ZIA</h2>
+<div class="meta"><span class="role ops">Security ops lead</span><span>Then ZIA policy, SSL inspection and blocklist administrator</span></div></div>
+<p class="lede">The on-premises Blue Coat proxy only protected people sitting on the bank network. Remote work meant users needed the same filtering wherever they were, so internet access moved to Zscaler Internet Access, a cloud proxy reached through an agent on each device.</p>
+<figure class="fig"><div data-d="p2"></div><figcaption>One policy for office and remote users. Destinations that cannot survive inspection go direct, each with an owner.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Decision</th><th>We chose</th><th>Because</th></tr></thead><tbody>
+<tr><td>Big-bang switch or parallel run</td><td>Parallel run, moved group by group</td><td>Any group could go back to Blue Coat while issues were fixed.</td></tr>
+<tr><td>Inspect everything or bypass broadly</td><td>Inspect by default, with an approved bypass list</td><td>Each bypass needed a business owner and a reason, so the list could not quietly become a hole.</td></tr>
+<tr><td>Roll a user back or relax one rule</td><td>Relax one rule for one group, fix, then restore</td><td>The business kept working and no exception became permanent.</td></tr>
+<tr><td>New joiners on old or new proxy</td><td>Straight to Zscaler</td><td>A new-hire access group stopped the old proxy's population growing.</td></tr>
+</tbody></table></div>
+<div class="two">
+<div><span class="lbl">How it was built</span><ul class="b">
+<li>Bank root certificate and the Client Connector pushed to devices before any traffic moved.</li>
+<li>Client tunnels to the nearest Zscaler service edge on <code>443</code>. Users sign in once through the identity provider (SAML, Security Assertion Markup Language), and group membership drives policy.</li>
+<li>Policy order: direct bypass, do-not-inspect list, URL categories, cloud app control, DLP (Data Loss Prevention) on uploads, file-type rules, threat blocklists.</li>
+<li>Market data feeds, log transfers and in-house applications that broke under inspection were each fixed with a tested, owned bypass.</li>
+<li>Web logs streamed to the SIEM for investigations and audit evidence.</li>
+</ul></div>
+<div><span class="lbl">Gates passed</span><ul class="chips"><li>Pilot with IT and security staff</li><li>Application test per department</li><li>CAB per user group</li><li>Bypass approvals by owner</li><li>Blue Coat decommission record</li></ul>
+<div class="proof"><b>Blue Coat was switched off when</b> no user traffic had reached it for an agreed period, no critical tickets were open, and block pages, DLP tests and SIEM log search all worked from Zscaler.</div></div>
+</div>
+<div class="minute"><span class="who">In one minute</span><p>We moved internet access from an on-premises proxy to Zscaler so remote users got the same protection as office users. Both ran in parallel and we moved by group. The real work was the breakages: data feeds, log transfers and in-house apps that failed under SSL inspection. Each got an owned, approved bypass instead of a blanket exception. When the first large wave of about 800 users raised critical tickets, I relaxed one rule for one group, fixed it and put it back, so the business never stopped and no hole stayed open.</p></div>
+</article>
+
+<!-- 03 -->
+<article id="p3" aria-labelledby="p3h">
+<div class="head"><span class="eyebrow">03 · Endpoint protection and identity</span><h2 id="p3h">SentinelOne to Microsoft Defender, Intune and Entra ID</h2>
+<div class="meta"><span class="role led">Led</span><span>Ran the PoC, then the bank's technical lead with the vendor across six countries</span></div></div>
+<p class="lede">The bank consolidated on its Microsoft 365 E5 licence: Defender for Endpoint for protection, Intune for device policy and Entra ID for identity, replacing SentinelOne and Trend Micro. The one design rule was that no device could be unprotected at any point in the change.</p>
+<figure class="fig"><div data-d="p3"></div><figcaption>A device left SentinelOne only after Defender proved it was protecting it.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Decision</th><th>We chose</th><th>Because</th></tr></thead><tbody>
+<tr><td>Rip and replace or overlap</td><td>Short overlap on each device, Defender running passive</td><td>The old agent stays until the new one is proven, so the device is never bare.</td></tr>
+<tr><td>Wave order</td><td>Headquarters first: IT users, departments, test, database, then production servers; other entities after</td><td>Problems surface where support is closest, and the riskiest servers go last.</td></tr>
+<tr><td>What closes a wave</td><td>Every agent online and its alerts reaching the SIEM</td><td>An agent count proves installation, not protection.</td></tr>
+<tr><td>One onboarding method or several</td><td>Intune for managed workstations, scripts and group policy for servers</td><td>Servers and unmanaged devices could not wait for Intune enrolment.</td></tr>
+</tbody></table></div>
+<div class="two">
+<div><span class="lbl">How it was built</span><ul class="b">
+<li>Defender sensor talks to Microsoft on <code>443</code>. Zscaler bypasses inspection for Microsoft security endpoints, a policy I built when connectivity blocked onboarding.</li>
+<li>During the overlap Defender antivirus ran passive with the EDR (Endpoint Detection and Response) sensor still recording. On Windows Server, passive mode is set before onboarding.</li>
+<li>Per-device check, scripted: sensor registered and healthy, old agents removed, reboot, antivirus mode Normal, test alert raised and received.</li>
+<li>Intune applied antivirus, attack surface reduction and baseline profiles. Exceptions followed the same ticket, approval and expiry rule as before.</li>
+<li>A device that failed after removal was isolated from the network, reinstalled and retested.</li>
+</ul></div>
+<div><span class="lbl">Gates passed</span><ul class="chips"><li>PoC against the incumbent</li><li>Risk and data location review</li><li>CAB per wave and entity</li><li>SOC acceptance</li><li>SentinelOne and Trend Micro decommission</li></ul>
+<div class="proof"><b>When onboarding fell behind plan</b>, I broke the gap down by cause: network connectivity, agent conflicts and offline devices. I fixed the connectivity cases myself, gave infrastructure a named list for the rest, and reported wave by wave so the numbers could be explained, not just increased.</div></div>
+</div>
+<div class="minute"><span class="who">In one minute</span><p>I led the Defender PoC against our incumbent, then the rollout across six countries. The rule was that no device is ever unprotected. Defender went on first in passive mode. We proved it was registered and healthy, removed SentinelOne and Trend Micro, rebooted, and proved Defender was active and its alerts reached the SIEM. A wave didn't close on agent counts. It closed when every device was proven.</p></div>
+</article>
+
+<!-- 04 -->
+<article id="p4" aria-labelledby="p4h">
+<div class="head"><span class="eyebrow">04 · Data discovery</span><h2 id="p4h">BigID data discovery, PoC to production</h2>
+<div class="meta"><span class="role ops">Security ops lead</span><span>The privacy team owned classification. I made it safe to scan.</span></div></div>
+<p class="lede">The bank needed to know where personal and sensitive data lived before it could label, protect or retain it, and to support privacy work such as records of processing and data subject requests. BigID scans data stores and reports what it finds.</p>
+<figure class="fig"><div data-d="p4"></div><figcaption>Scanners run inside the bank. Only findings leave the data zone, never copies of the data.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Decision</th><th>We chose</th><th>Because</th></tr></thead><tbody>
+<tr><td>Where scanning runs</td><td>Scanners inside the bank, next to the sources</td><td>Raw data never crosses the network boundary.</td></tr>
+<tr><td>Access to each source</td><td>One read-only service account per source, approved by its owner</td><td>No shared, high-privilege account that opens every system.</td></tr>
+<tr><td>How wide the PoC went</td><td>About five sources, one per technology</td><td>Proves connectivity, accuracy and load before scaling.</td></tr>
+<tr><td>Vendor access</td><td>Named, time-boxed and monitored</td><td>Vendor activity checked against approved scope.</td></tr>
+</tbody></table></div>
+<div class="two">
+<div><span class="lbl">How it was built</span><ul class="b">
+<li>Standard connector paths: file shares over SMB (Server Message Block) <code>445</code>, databases on their listener ports, Microsoft 365 through Graph on <code>443</code>.</li>
+<li>Each source onboarded through its own network rule, owner approval and service account.</li>
+<li>Database scans scheduled off-hours so production was not slowed.</li>
+<li>Access split by role: privacy administration, security audit, and data owners seeing only their own sources.</li>
+</ul></div>
+<div><span class="lbl">Gates passed</span><ul class="chips"><li>PoC success criteria</li><li>Data owner approval per source</li><li>Network change per source</li><li>Vendor access approval</li><li>Handover to privacy team</li></ul>
+<div class="proof"><b>My part:</b> progress reporting to management, unblocking access with application owners and the network team, and monitoring vendor activity in bank environments.</div></div>
+</div>
+<div class="minute"><span class="who">In one minute</span><p>On BigID I led for security operations; data classification belonged to our privacy colleague. My job was making scanning safe: scanners inside the bank so data never left, read-only accounts approved by each owner, network rules per source, and watching the vendor's activity against the approved scope. We proved it on about five sources before scaling.</p></div>
+</article>
+
+<!-- 05 -->
+<article id="p5" aria-labelledby="p5h">
+<div class="head"><span class="eyebrow">05 · Network detection</span><h2 id="p5h">Darktrace network detection, PoC to production</h2>
+<div class="meta"><span class="role ops">Security ops lead</span><span>The network team deployed sensors. I ran the security side and tuning.</span></div></div>
+<p class="lede">Endpoint agents only see devices that have agents. Darktrace watches copies of internal traffic and learns normal behaviour, so it can flag lateral movement, unusual data transfers and unmanaged devices that the EDR cannot see.</p>
+<figure class="fig"><div data-d="p5"></div><figcaption>Passive by design: sensors receive mirrored traffic, so a sensor failure never touches production.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Decision</th><th>We chose</th><th>Because</th></tr></thead><tbody>
+<tr><td>Inline or mirrored traffic</td><td>Mirrored (SPAN, Switched Port Analyzer) feeds</td><td>No risk to production traffic.</td></tr>
+<tr><td>Alert on day one or learn first</td><td>Learning period, then tuning with the SOC</td><td>Behavioural models need a baseline before alerts mean anything.</td></tr>
+<tr><td>Silence noisy models or tag devices</td><td>Tag known tools such as vulnerability scanners</td><td>The model still catches an attacker doing what the scanner does.</td></tr>
+<tr><td>Separate console or one queue</td><td>Alerts into the SIEM</td><td>Analysts work one queue.</td></tr>
+</tbody></table></div>
+<div class="two">
+<div><span class="lbl">How it was built</span><ul class="b">
+<li>Core and data-centre switches mirror traffic to sensor capture ports, so east-west traffic between servers is visible.</li>
+<li>Sensors send metadata to the master on <code>443</code>. The master forwards alerts to the SIEM by syslog.</li>
+<li>Enrichment from directory and DNS (Domain Name System) data maps addresses to devices and users.</li>
+<li>Early noise fixed by tagging: our own Qualys scans looked like lateral movement until the scanners were labelled.</li>
+</ul></div>
+<div><span class="lbl">Gates passed</span><ul class="chips"><li>PoC on selected segments</li><li>Network change for mirror sessions</li><li>Tuning sign-off with SOC</li><li>SOC runbooks and handover</li></ul>
+<div class="proof"><b>Ready for the SOC when</b> sensors showed traffic from every planned segment, the noisiest models had been reviewed, and each alert type had a triage runbook and escalation path.</div></div>
+</div>
+<div class="minute"><span class="who">In one minute</span><p>Darktrace gave us east-west visibility that endpoint agents couldn't. It's passive: mirror ports feed the sensors, so if a sensor fails, production doesn't notice. The network team placed the sensors and I ran the security side. In the first weeks our own Qualys scans looked like lateral movement. Instead of muting the model, I tagged the scanners, so a real attacker doing the same thing would still be caught.</p></div>
+</article>
+
+<!-- 06 -->
+<article id="p6" aria-labelledby="p6h">
+<div class="head"><span class="eyebrow">06 · Asset visibility</span><h2 id="p6h">Lansweeper scanning to agent and cloud</h2>
+<div class="meta"><span class="role">Supported</span><span>Lansweeper was one of the ten sources in my control-coverage reconciliation</span></div></div>
+<p class="lede">Network scanning only finds devices that are connected when the scan runs, so remote laptops went stale. It also needs an account with admin rights on every machine. Moving to the Lansweeper agent fixed both problems, and the cloud link gave one view across entities.</p>
+<figure class="fig"><div data-d="p6"></div><figcaption>Agents report from anywhere. Agentless scanning stays only for devices that cannot run an agent.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Decision</th><th>We chose</th><th>Because</th></tr></thead><tbody>
+<tr><td>Agentless, agent or both</td><td>Agent on endpoints and servers, read-only SNMP for network devices</td><td>Each device type gets the method it supports.</td></tr>
+<tr><td>Domain-wide scanning account</td><td>Retired once agent coverage was confirmed</td><td>Removes a high-value credential from the estate.</td></tr>
+<tr><td>Off-network laptops</td><td>Report through the cloud relay on 443</td><td>No dependence on VPN connection.</td></tr>
+</tbody></table></div>
+<div class="two">
+<div><span class="lbl">How it was built</span><ul class="b">
+<li>LsAgent reports to the scanning server on the network, or through the Lansweeper cloud relay on <code>443</code> when off-network.</li>
+<li>The on-premises installation links to a Lansweeper cloud site for a multi-entity view.</li>
+<li>Agent added to gold images so new builds report from day one.</li>
+</ul></div>
+<div><span class="lbl">Why it mattered</span>
+<div class="proof"><b>Inventory is the denominator.</b> Every coverage figure in the CISO report divided by it. A stale inventory makes every protection percentage wrong, so new records were reconciled against the directory, Defender and ManageEngine.</div></div>
+</div>
+</article>
+
+<!-- 07 -->
+<article id="p7" aria-labelledby="p7h">
+<div class="head"><span class="eyebrow">07 · Hardening</span><h2 id="p7h">Minimum security baseline</h2>
+<div class="meta"><span class="role">Supported</span><span>I tested controls and cleared false positives</span></div></div>
+<p class="lede">Devices built at different times had different settings, and nobody could prove the estate met one standard. The baseline set one hardening standard per platform, built from CIS (Center for Internet Security) Benchmarks, then enforced and measured it.</p>
+<figure class="fig"><div data-d="p7"></div><figcaption>A baseline is four parts. Without the measure and govern steps, it is only a document.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Decision</th><th>We chose</th><th>Because</th></tr></thead><tbody>
+<tr><td>Write from scratch or adopt</td><td>Adopt CIS and tailor</td><td>Defensible to auditors and faster to agree.</td></tr>
+<tr><td>Enforce or measure first</td><td>Measure in audit mode, fix, then enforce by wave</td><td>Application breakages surface before they hit users.</td></tr>
+<tr><td>Trust the scanner or verify</td><td>Verify each failed check on a test machine</td><td>A report full of false failures gets ignored.</td></tr>
+</tbody></table></div>
+<div class="two">
+<div><span class="lbl">Typical settings in scope</span><ul class="b">
+<li>SMBv1 and LLMNR (Link-Local Multicast Name Resolution) disabled; NTLMv2 only.</li>
+<li>Unique local administrator passwords (LAPS, Local Administrator Password Solution).</li>
+<li>BitLocker on laptops, screen lock on idle, host firewall on all profiles.</li>
+<li>Audit policy and PowerShell logging on.</li>
+</ul></div>
+<div><span class="lbl">My part</span>
+<div class="proof"><b>When the scanner said a control failed</b>, I proved on a test machine whether it really failed, the check was wrong, or a compensating control existed, before anything was raised to an owner.</div></div>
+</div>
+</article>
+
+<!-- 08 -->
+<article id="p8" aria-labelledby="p8h">
+<div class="head"><span class="eyebrow">08 · Resilience</span><h2 id="p8h">Disaster recovery exercises for security platforms</h2>
+<div class="meta"><span class="role">Supported</span><span>Annual drills and semi-annual rehearsals; four crisis war rooms</span></div></div>
+<p class="lede">Applications come up at the recovery site, but the agents, proxy path, certificates and log forwarding often were never tested there. My part of each drill was proving that security controls followed the workload.</p>
+<figure class="fig"><div data-d="p8"></div><figcaption>The same checks run before failover, after failover and after failback.</figcaption></figure>
+<div class="tbl"><table><thead><tr><th>Check</th><th>Before failover</th><th>After failover</th></tr></thead><tbody>
+<tr><td>Endpoint agents</td><td>Recovery servers listed, online, on the right policy</td><td>Online from the recovery network; test alert raised</td></tr>
+<tr><td>Internet path</td><td>Egress rules and bypasses exist at the recovery site</td><td>Browsing filtered; critical feeds still work</td></tr>
+<tr><td>Logging</td><td>Collectors configured at the recovery site</td><td>Events from recovery hosts reach the SIEM</td></tr>
+<tr><td>Certificates</td><td>Console and inspection certificates checked for expiry</td><td>No certificate errors on agents or browsers</td></tr>
+</tbody></table></div>
+<div class="proof"><b>Lesson carried into every drill:</b> one forgotten dependency, an expired console certificate, once took several hundred agents offline in one entity. Certificate expiry checks went into the drill checklist, and expiry reminders went to a team mailbox with the impact spelled out.</div>
+</article>
+
+<!-- 09 -->
+<article id="p9" aria-labelledby="p9h">
+<div class="head"><span class="eyebrow">09 · Assurance and reporting</span><h2 id="p9h">Control status reporting to the CISO</h2>
+<div class="meta"><span class="role led">Led</span><span>Built the workbook, wrote the biweekly pack, then presented it</span></div></div>
+<p class="lede">Each security tool reported its own coverage, and each one looked good on its own. Joined together against the asset inventory, they told a different story. This was not a CAB change. It was a reporting line straight to the CISO and senior management, and it is how the 478 devices that looked protected but were not came to light.</p>
+<figure class="fig"><div data-d="p9"></div><figcaption>Ten tools joined per device, so the report shows which controls actually cover each asset.</figcaption></figure>
+<div class="two">
+<div><span class="lbl">How it was built</span><ul class="b">
+<li>Exports from ten tools, including the EDR consoles, Qualys, ManageEngine, Lansweeper, Intune and the directory, matched per device against the inventory.</li>
+<li>SentinelOne data pulled straight into Excel through its API with Power Query, so the figures were not retyped.</li>
+<li>Each device rated on whether its controls were present and actually working, not just installed.</li>
+<li>Agile in practice: the pack changed every cycle as leadership asked new questions.</li>
+</ul></div>
+<div><span class="lbl">Governance</span><ul class="chips"><li>No CAB: reporting only</li><li>Biweekly to CISO</li><li>Senior management review</li><li>Figures reconciled wave by wave</li></ul>
+<div class="proof"><b>Why it mattered:</b> a console counted those 478 devices as covered. The joined view showed they were not. 180 active user machines were reinstalled and the rest were triaged.</div></div>
+</div>
+<div class="minute"><span class="who">In one minute</span><p>Every tool said coverage was fine, so I joined ten of them against the asset inventory, device by device. That showed 478 devices the console counted as protected that weren't. I wrote the biweekly control pack for the CISO and later presented it myself, which meant defending every figure. That's why I reconciled wave by wave instead of quoting totals.</p></div>
+</article>
+
+</main>
+
+<section class="life" id="lifecycle" aria-labelledby="lifeh">
+<span class="eyebrow">Applies to every project</span>
+<h2 id="lifeh">How a change got from idea to production</h2>
+<p>None of these platforms went live because the technology worked. Each moved through the same eight stages, and each stage left a record that an auditor, the CISO (Chief Information Security Officer) or CAB (Change Advisory Board) could ask for. Click a stage.</p>
+
+<div class="track" role="tablist" aria-label="Delivery stages"><span class="runner" aria-hidden="true"></span>
+<button class="step" role="tab" data-s="0"><span class="num">1</span><span class="nm">Proof of concept</span></button>
+<button class="step" role="tab" data-s="1"><span class="num">2</span><span class="nm">Recommend and acquire</span></button>
+<button class="step" role="tab" data-s="2"><span class="num">3</span><span class="nm">Risk assessment</span></button>
+<button class="step" role="tab" data-s="3"><span class="num">4</span><span class="nm">PMO plan, CAB walkthrough</span></button>
+<button class="step" role="tab" data-s="4"><span class="num">5</span><span class="nm">Build and staging</span></button>
+<button class="step" role="tab" data-s="5"><span class="num">6</span><span class="nm">Testing</span></button>
+<button class="step" role="tab" data-s="6"><span class="num">7</span><span class="nm">Waves and hypercare</span></button>
+<button class="step" role="tab" data-s="7"><span class="num">8</span><span class="nm">Handover and closure</span></button>
+</div>
+<div class="stage-card" aria-live="polite"><span class="lbl" id="sg-k">Stage 1</span><h3 id="sg-t">Proof of concept</h3><p id="sg-d"></p><p class="rec"><b>Record produced:</b> <span id="sg-r"></span></p></div>
+
+<div class="tabset">
+<div class="pane" data-label="Rollout model">
+<p>Every platform here went in by phased waves or a parallel run, never big bang. A security agent touches every device, so a bad setting in a big bang breaks the whole estate at once and leaves no healthy group to compare against. Agile suited the reporting work, which improved in short cycles, but not production rollouts, which need fixed CAB windows.</p>
+<div class="tbl"><table><thead><tr><th>Project</th><th>Model</th></tr></thead><tbody>
+<tr><td>SentinelOne to cloud</td><td>Waves by device type</td></tr>
+<tr><td>Zscaler</td><td>Parallel run, moved by user group</td></tr>
+<tr><td>Defender</td><td>Waves, headquarters first, then entity by entity</td></tr>
+<tr><td>BigID</td><td>Source by source</td></tr>
+<tr><td>Darktrace</td><td>Segment by segment, passive</td></tr>
+</tbody></table></div>
+</div>
+<div class="pane" data-label="CAB pack">
+<ul class="b">
+<li><b>Scope:</b> which devices or users, with a list attached.</li>
+<li><b>Impact:</b> business impact and the outage window, if one was needed.</li>
+<li><b>Evidence:</b> test results from the lab and the previous wave.</li>
+<li><b>Risk:</b> risk register reference and owner approvals.</li>
+<li><b>Stop rules:</b> what makes us halt the wave.</li>
+<li><b>Rollback:</b> the steps and how long they take.</li>
+<li><b>Success criteria:</b> what the wave must meet before the next one is requested.</li>
+</ul>
+</div>
+<div class="pane" data-label="If things go wrong">
+<p>Agreed with CAB before the first wave, so nobody had to invent a response mid-change.</p>
+<div class="tbl"><table><thead><tr><th>If this happens</th><th>We do this</th><th>Who decides</th></tr></thead><tbody>
+<tr><td>A business application breaks</td><td>Stop the wave. Apply a scoped, time-limited exception for that group, fix, then remove it.</td><td>Change owner, with the application owner</td></tr>
+<tr><td>Devices lose protection or stop reporting</td><td>Stop the wave. Isolate any unprotected device. Roll the wave back.</td><td>Change owner; CISO informed</td></tr>
+<tr><td>Performance complaints above the agreed level</td><td>Pause. Compare with the lab load test, adjust policy, retest on the pilot group.</td><td>Change owner</td></tr>
+<tr><td>Alerts stop reaching the SOC</td><td>No further waves until a test alert is received again.</td><td>SOC manager</td></tr>
+<tr><td>Vendor cloud outage</td><td>Agents keep protecting locally. SOC uses local logs until the console returns.</td><td>CISO</td></tr>
+<tr><td>Rollback itself fails</td><td>Reinstall the old agent from the retained package. The old platform is never retired before the last wave closes.</td><td>Change owner, emergency CAB</td></tr>
+</tbody></table></div>
+</div>
+<div class="pane" data-label="Testing">
+<ul class="b">
+<li><b>Functional:</b> policy applied, device visible, response actions such as isolation work.</li>
+<li><b>Load:</b> CPU and memory measured on laptops, VMs and cloned production servers under normal and heavy work.</li>
+<li><b>Security:</b> safe test files and simulated attacker behaviour, with the SOC (Security Operations Centre) told in advance so alerts could be matched to the test.</li>
+<li><b>Tamper:</b> try to stop or uninstall the agent as a local user. It must refuse.</li>
+<li><b>Availability:</b> after go-live, daily checks for offline or unhealthy agents, using the offline-agent runbook before escalating to the vendor.</li>
+</ul>
+</div>
+<div class="pane" data-label="Build checks">
+<ul class="b">
+<li><b>On-premises servers:</b> staged on a hardened build, vulnerability-scanned clean, admin accounts in the privileged access vault with password rotation, backups taken and a restore tested.</li>
+<li><b>Cloud services:</b> outbound path on <code>443</code> through firewall and proxy, inspection bypass where needed, tenant data location confirmed.</li>
+<li><b>Log retention:</b> how long the platform keeps events, checked against the bank's requirement. Where it kept less, logs went to the SIEM (Security Information and Event Management), which holds them longer.</li>
+<li><b>Certificates:</b> expiry dates recorded, with reminders to a team mailbox.</li>
+</ul>
+</div>
+<div class="pane" data-label="Who did what">
+<div class="tbl">
+<table>
+<colgroup><col><col class="me"><col span="6"></colgroup>
+<thead><tr><th>Activity</th><th>Me</th><th>CISO</th><th>Risk</th><th>Infra &amp; network</th><th>SOC</th><th>PMO</th><th>CAB</th></tr></thead>
+<tbody>
+<tr><td>PoC tests and summary report</td><td class="c r me">R</td><td class="c a">A</td><td class="c">I</td><td class="c">C</td><td class="c">C</td><td class="c">I</td><td class="c">–</td></tr>
+<tr><td>Recommendation for acquisition</td><td class="c me">C</td><td class="c a">A</td><td class="c">C</td><td class="c">C</td><td class="c">I</td><td class="c">I</td><td class="c">–</td></tr>
+<tr><td>Risk assessment and register entry</td><td class="c r me">R</td><td class="c">C</td><td class="c a">A</td><td class="c">C</td><td class="c">I</td><td class="c">I</td><td class="c">–</td></tr>
+<tr><td>Project plan and timeline</td><td class="c me">C</td><td class="c">I</td><td class="c">–</td><td class="c">C</td><td class="c">C</td><td class="c r">R</td><td class="c">I</td></tr>
+<tr><td>CAB walkthrough of the rollout method</td><td class="c r me">R</td><td class="c">I</td><td class="c">C</td><td class="c">C</td><td class="c">I</td><td class="c">C</td><td class="c a">A</td></tr>
+<tr><td>Build, staging and testing</td><td class="c r me">R</td><td class="c">I</td><td class="c">–</td><td class="c r">R</td><td class="c">C</td><td class="c">I</td><td class="c">–</td></tr>
+<tr><td>CAB pack and approval per wave</td><td class="c r me">R</td><td class="c">I</td><td class="c">C</td><td class="c">C</td><td class="c">I</td><td class="c">I</td><td class="c a">A</td></tr>
+<tr><td>Wave execution and validation</td><td class="c r me">R</td><td class="c">I</td><td class="c">–</td><td class="c r">R</td><td class="c">C</td><td class="c">I</td><td class="c">I</td></tr>
+<tr><td>Exceptions and risk acceptance</td><td class="c r me">R</td><td class="c a">A</td><td class="c">C</td><td class="c">C</td><td class="c">I</td><td class="c">–</td><td class="c">–</td></tr>
+<tr><td>SOC acceptance and handover</td><td class="c r me">R</td><td class="c">I</td><td class="c">–</td><td class="c">I</td><td class="c a">A</td><td class="c">I</td><td class="c">–</td></tr>
+<tr><td>Control status reporting</td><td class="c r me">R</td><td class="c a">A</td><td class="c">I</td><td class="c">I</td><td class="c">C</td><td class="c">–</td><td class="c">–</td></tr>
+</tbody>
+</table>
+</div>
+<p class="legend">R does the work · A approves and is accountable · C consulted · I informed. My column is shaded. Where a design changed where data is stored, the risk committee and the regulator came in at stage 3.</p>
+</div>
+</div>
+</section>
+
+<footer>Mohsin Anwar Sharif · Written from personal experience; no employer documents or data used. Configuration values are vendor-standard examples. · <a href="index.html">Back to portfolio</a></footer>
+</div>
+
+<script>
+(function(){
+ var NS='http://www.w3.org/2000/svg',W=220,H=92,X=[20,270,520],Y=[20,150,280];
+ var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+ var D={
+ p1:{label:'SentinelOne on-premises to cloud design',n:[
+  ['ag',0,0,'Endpoints and servers',['Moved in waves','Servers in outage windows','TCP 443, TLS']],
+  ['px',1,0,'Firewall and web proxy',['Vendor domain allowed','No SSL inspection','No proxy authentication']],
+  ['cl',2,0,'SentinelOne cloud tenant',['Site per entity','Groups by device type','Role-based admin access'],'core'],
+  ['gt',0,1,'Approval gate',['Central bank sign-off','Risk committee','CAB per wave']],
+  ['op',1,1,'On-prem console',['Kept live as fallback','Retired after last wave'],'ext'],
+  ['si',2,1,'SIEM and SOC',['Alerts by syslog or API','Wave closes when its','test alert lands here']]],
+  e:[['ag','px'],['px','cl'],['cl','si','alerts'],['gt','ag','approves'],['op','ag','rollback',90,1]]},
+ p2:{label:'Zscaler ZIA target design',n:[
+  ['ep',0,0,'Endpoints',['Client Connector','Tunnel to nearest edge','Bank root certificate']],
+  ['zi',1,0,'Zscaler ZIA cloud',['SSL inspection, URL rules','App control, DLP','One policy for everyone'],'core'],
+  ['in',2,0,'Internet and SaaS',['Allowed traffic only','Re-encrypted to the site']],
+  ['by',0,1,'Approved bypasses',['Data feeds, log transfers','In-house apps, EDR','Each with an owner']],
+  ['id',1,1,'Identity provider',['SAML sign-in','Groups drive policy']],
+  ['si',2,1,'SIEM and SOC',['Web logs streamed','Investigation and audit']]],
+  e:[['ep','zi'],['zi','in'],['ep','by','direct'],['id','zi','SAML',-40],['zi','si','logs',40]]},
+ p3:{label:'Defender cutover per device',n:[
+  ['on',0,0,'1. Onboard Defender',['Intune, script or GPO','Antivirus passive','Old agent still active']],
+  ['ck',1,0,'2. Prove it is healthy',['Sensor registered','Visible in portal','Recent check-in']],
+  ['rm',2,0,'3. Remove old agents',['SentinelOne, Trend Micro','Reboot']],
+  ['im',0,1,'Intune and Entra ID',['Antivirus, ASR, baseline','Device compliance','Groups scope policy']],
+  ['fx',1,1,'Fix and recheck',['Proxy bypass, conflicts','Isolate if unprotected'],'ext'],
+  ['vf',2,1,'4. Verify and close',['Antivirus mode Normal','Test alert reaches SIEM','Counts toward the wave'],'core']],
+  e:[['on','ck'],['ck','rm'],['rm','vf'],['ck','fx','not healthy',-40],['fx','ck','fixed',40],['im','on','policy']]},
+ p4:{label:'BigID scanning design',zones:[[8,8,494,276,'Bank data zone']],n:[
+  ['ds',0,0,'Data sources',['File shares, databases','Microsoft 365']],
+  ['sc',1,0,'BigID scanners',['Inside the bank','Read-only, per source','Off-hours schedules'],'core'],
+  ['bp',2,0,'BigID platform',['Findings only, no copies','Privacy team classifies','Security audits access']],
+  ['ow',0,1,'Data owners',['Approve each source','Review their findings']],
+  ['vd',2,1,'Vendor engineers',['Time-boxed access','Activity monitored'],'ext']],
+  e:[['sc','ds'],['sc','bp'],['ow','ds','approve'],['vd','sc','monitored support']]},
+ p5:{label:'Darktrace passive monitoring design',n:[
+  ['sw',0,0,'Core and DC switches',['Mirror sessions (SPAN)','East-west traffic','Both directions']],
+  ['se',1,0,'Darktrace sensors',['Receive copies only','Extract metadata'],'core'],
+  ['ma',2,0,'Darktrace master',['Behaviour baseline','per device','Model breaches']],
+  ['en',1,1,'Directory and DNS',['Map addresses to','devices and users']],
+  ['tg',0,1,'Known-device tags',['Scanners, jump hosts','Exempt per model only']],
+  ['si',2,1,'SIEM and SOC',['One alert queue','Triage runbooks']]],
+  e:[['sw','se'],['se','ma','443'],['ma','si','syslog',40],['en','ma','enrich',-40],['tg','se','tuning',-40]]},
+ p6:{label:'Lansweeper agent and cloud design',n:[
+  ['ag',0,0,'LsAgent on devices',['Endpoints and servers','In gold images']],
+  ['ss',1,0,'Scanning server',['On the bank network','Merges records'],'core'],
+  ['cs',2,0,'Lansweeper cloud',['One view across','entities']],
+  ['rl',0,1,'Cloud relay',['Off-network laptops','report on 443'],'ext'],
+  ['nd',1,1,'Network devices',['Agentless SNMP','Read-only']],
+  ['rc',2,1,'Coverage reconciliation',['Against directory,','Defender, ManageEngine']]],
+  e:[['ag','ss','on network'],['ss','cs','sync'],['ag','rl','off network'],['nd','ss','SNMP'],['cs','rc']]},
+ p7:{label:'Baseline define, enforce, measure, govern',rows:1,n:[
+  ['df',0,0,'Define',['CIS Benchmark, tailored','A reason per setting']],
+  ['en',1,0,'Enforce',['Intune profiles','Group policy for servers'],'core'],
+  ['ms',2,0,'Measure and govern',['Qualys policy checks','Secure Score','Exceptions with expiry']]],
+  e:[['df','en'],['en','ms']]},
+ p8:{label:'Security checks in a DR drill',rows:1,n:[
+  ['pr',0,0,'Before failover',['Agents bound at DR','Egress and bypasses','Certificate expiry']],
+  ['fo',1,0,'Failover',['Watch agents and','SIEM flow live'],'core'],
+  ['po',2,0,'After failover',['Agents online','Browsing filtered','Alerts reach SOC']]],
+  e:[['pr','fo'],['fo','po']]},
+ p9:{label:'Control reporting data flow',n:[
+  ['ed',0,0,'Protection tools',['EDR consoles, Zscaler','Intune, Secure Score']],
+  ['wb',1,0,'Reconciliation workbook',['Joined per device','Present vs working'],'core'],
+  ['pk',2,0,'Biweekly CISO pack',['Coverage by entity','Gaps with owners']],
+  ['in',0,1,'Inventory sources',['Directory, Lansweeper','ManageEngine']],
+  ['vm',1,1,'Exposure data',['Qualys, SentinelOne','Ranger']],
+  ['ac',2,1,'Actions',['Reinstall, repair','Owner follow-up']]],
+  e:[['ed','wb'],['wb','pk'],['in','wb','denominator',-40],['vm','wb','',40],['pk','ac','decisions']]}
+ };
+ function draw(spec){
+  var rows=spec.rows||2,h=Y[rows-1]+H+(spec.zones?44:24),o=[],pos={},id=spec.id;
+  o.push('<svg viewBox="0 0 760 '+h+'" role="img" aria-label="'+esc(spec.label)+'"><defs><marker id="ah-'+id+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>');
+  (spec.zones||[]).forEach(function(z){o.push('<rect class="zone" x="'+z[0]+'" y="'+z[1]+'" width="'+z[2]+'" height="'+z[3]+'" rx="12"/><text class="ztx" x="'+(z[0]+12)+'" y="'+(z[1]+z[3]-10)+'">'+esc(z[4])+'</text>')});
+  var edges=[];
+  spec.e.forEach(function(e,i){var a=null,b=null;spec.n.forEach(function(n){if(n[0]===e[0])a=n;if(n[0]===e[1])b=n});
+   var A={x:X[a[1]],y:Y[a[2]]},B={x:X[b[1]],y:Y[b[2]]},d,lx,ly,anc='start';
+   if(A.y===B.y){var r=B.x>A.x,x1=r?A.x+W:A.x,x2=r?B.x:B.x+W,yy=A.y+H/2;d='M'+x1+' '+yy+'H'+(r?x2-2:x2+2);lx=(x1+x2)/2;ly=yy-8;anc='middle'}
+   else if(A.x===B.x){var dn=B.y>A.y,y1=dn?A.y+H:A.y,y2=dn?B.y:B.y+H,xx=A.x+W/2+(e[3]||0);d='M'+xx+' '+y1+'V'+(dn?y2-2:y2+2);lx=xx+8;ly=(y1+y2)/2+4}
+   else{var dn2=B.y>A.y,sx=A.x+W/2,sy=dn2?A.y+H:A.y,ex=B.x+W/2+(e[3]||0),ey=dn2?B.y:B.y+H,my=(sy+ey)/2;d='M'+sx+' '+sy+'V'+my+'H'+ex+'V'+(dn2?ey-2:ey+2);lx=Math.min(sx,ex)+12;ly=my-6}
+   var pid=id+'-e'+i,da=' data-a="'+e[0]+'" data-b="'+e[1]+'"';
+   edges.push('<path id="'+pid+'" class="edge'+(e[4]?' dash':'')+'"'+da+' style="--i:'+i+'" d="'+d+'" marker-end="url(#ah-'+id+')"/>');
+   if(e[2])edges.push('<text class="et"'+da+' x="'+lx+'" y="'+ly+'" text-anchor="'+anc+'">'+esc(e[2])+'</text>');
+   if(!calm){var dur=(2.2+(i%3)*0.3).toFixed(1),beg=(1.1+i*0.55).toFixed(2);
+    edges.push('<g class="pk"'+da+'><circle class="halo" r="7" visibility="hidden"><set attributeName="visibility" to="visible" begin="'+beg+'s"/><animateMotion dur="'+dur+'s" begin="'+beg+'s" repeatCount="indefinite"><mpath href="#'+pid+'"/></animateMotion></circle><circle class="pulse" r="3.5" visibility="hidden"><set attributeName="visibility" to="visible" begin="'+beg+'s"/><animateMotion dur="'+dur+'s" begin="'+beg+'s" repeatCount="indefinite"><mpath href="#'+pid+'"/></animateMotion></circle></g>')}
+  });
+  spec.n.forEach(function(n,i){var x=X[n[1]],y=Y[n[2]];
+   o.push('<g class="node '+(n[5]||'')+'" data-n="'+n[0]+'" tabindex="0" style="--i:'+i+'"><rect class="box" x="'+x+'" y="'+y+'" width="'+W+'" height="'+H+'" rx="12"/><text class="bt" x="'+(x+14)+'" y="'+(y+26)+'">'+esc(n[3])+'</text>');
+   n[4].forEach(function(l,j){o.push('<text class="bl" x="'+(x+14)+'" y="'+(y+46+j*17)+'">'+esc(l)+'</text>')});o.push('</g>')});
+  o.push(edges.join(''));o.push('</svg>');return o.join('')}
+ function render(k){var host=document.querySelector('[data-d="'+k+'"]');if(!host||!D[k])return;D[k].id=k;host.innerHTML=draw(D[k]);
+  var svg=host.querySelector('svg');
+  svg.querySelectorAll('.edge').forEach(function(p){try{p.style.setProperty('--len',Math.ceil(p.getTotalLength()))}catch(e){}});
+  if(!calm){svg.classList.add('live')}
+  function clear(){svg.classList.remove('hl');svg.querySelectorAll('.on').forEach(function(x){x.classList.remove('on')})}
+  svg.querySelectorAll('.node').forEach(function(g){var n=g.getAttribute('data-n');
+   function on(){clear();svg.classList.add('hl');g.classList.add('on');
+    svg.querySelectorAll('[data-a]').forEach(function(x){var a=x.getAttribute('data-a'),b=x.getAttribute('data-b');
+     if(a===n||b===n){x.classList.add('on');var o=a===n?b:a;var t=svg.querySelector('.node[data-n="'+o+'"]');if(t)t.classList.add('on')}})}
+   g.addEventListener('mouseenter',on);g.addEventListener('focus',on);g.addEventListener('mouseleave',clear);g.addEventListener('blur',clear)});
+ }
+ function tabs(set,onShow){var panes=[].slice.call(set.querySelectorAll(':scope>.pane'));if(!panes.length)return;
+  var bar=document.createElement('div');bar.className='tabs';bar.setAttribute('role','tablist');
+  panes.forEach(function(p,i){var b=document.createElement('button');b.className='tab';b.setAttribute('role','tab');b.textContent=p.getAttribute('data-label');
+   p.setAttribute('role','tabpanel');
+   b.addEventListener('click',function(){bar.querySelectorAll('.tab').forEach(function(t,j){t.setAttribute('aria-selected',j===i);t.tabIndex=j===i?0:-1});
+    panes.forEach(function(q,j){q.hidden=j!==i});p.classList.remove('enter');void p.offsetWidth;p.classList.add('enter')});
+   b.addEventListener('keydown',function(ev){var d=ev.key==='ArrowRight'?1:ev.key==='ArrowLeft'?-1:0;if(!d)return;var bs=bar.querySelectorAll('.tab');var nx=bs[(i+d+bs.length)%bs.length];nx.focus();nx.click()});
+   bar.appendChild(b)});
+  set.insertBefore(bar,panes[0]);bar.querySelector('.tab').click()}
+ // build project panes
+ document.querySelectorAll('#projects article').forEach(function(art){art.classList.add('proj');
+  var fig=art.querySelector('figure');var cap=fig&&fig.querySelector('figcaption');
+  if(cap){cap.innerHTML='<span>'+cap.innerHTML+'</span><span class="hint">Hover or tab to a box to trace its connections</span>'}
+  var rest=[],el=fig.nextElementSibling;while(el){rest.push(el);el=el.nextElementSibling}
+  var set=document.createElement('div');set.className='tabset';
+  rest.forEach(function(r){var lab='Details';
+   if(r.classList.contains('tbl')){var th=r.querySelector('th');lab=th&&/Check/.test(th.textContent)?'Drill checks':'Decisions'}
+   else if(r.classList.contains('two'))lab='Build and proof';
+   else if(r.classList.contains('minute'))lab='In one minute';
+   else if(r.classList.contains('proof'))lab='Lesson learned';
+   var p=document.createElement('div');p.className='pane';p.setAttribute('data-label',lab);p.appendChild(r);set.appendChild(p)});
+  art.appendChild(set);tabs(set)});
+ document.querySelectorAll('.life .tabset').forEach(function(s){tabs(s)});
+ // project picker
+ var picks=[].slice.call(document.querySelectorAll('.pick')),picker=document.querySelector('.picker');
+ function show(k,scroll){picks.forEach(function(b){var on=b.getAttribute('data-p')===k;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;if(on&&b.scrollIntoView&&picker.scrollWidth>picker.clientWidth)picker.scrollLeft=b.offsetLeft-picker.clientWidth/2+b.clientWidth/2});
+  document.querySelectorAll('#projects article').forEach(function(a){var on=a.id===k;a.hidden=!on;if(on){a.classList.remove('enter');void a.offsetWidth;a.classList.add('enter')}});
+  render(k);
+  if(scroll){var top=picker.getBoundingClientRect().top;if(top<=1)window.scrollTo({top:window.scrollY+document.getElementById(k).getBoundingClientRect().top-picker.offsetHeight-8,behavior:calm?'auto':'smooth'})}
+  if(scroll){try{history.replaceState(null,'','#'+k)}catch(e){}}}
+ picks.forEach(function(b,i){b.addEventListener('click',function(){show(b.getAttribute('data-p'),true)});
+  b.addEventListener('keydown',function(ev){var d=ev.key==='ArrowRight'?1:ev.key==='ArrowLeft'?-1:0;if(!d)return;var nx=picks[(i+d+picks.length)%picks.length];nx.focus();nx.click()})});
+ var h=(location.hash||'').slice(1);show(/^p[1-9]$/.test(h)?h:'p1',false);
+ // lifecycle stages
+ var S=[
+  ['Proof of concept','Success criteria agreed before any testing: detection, performance, compatibility and manageability. Tested in the bank\'s own lab and on pilot devices, then written up against those criteria.','PoC summary report'],
+  ['Recommendation and acquisition','PoC results compared against criteria, with my technical input to the business case. Procurement and management own the purchase decision.','Recommendation and vendor security questionnaire'],
+  ['Risk assessment','Where data is stored and for how long, who at the vendor can reach it, and what breaks if the platform fails. Residual risk entered in the risk register for acceptance.','Risk register entry and risk acceptance'],
+  ['PMO plan and CAB walkthrough','The PMO (Project Management Office) sets timeline and dependencies. Before the first change, CAB is walked through how the waves, stop rules and rollback will work, so each later wave is approved against a method it already knows.','Project plan and CAB walkthrough'],
+  ['Build and staging','On-premises: server staged on a hardened build, scanned clean and backed up before go-live. Cloud: tenant built, outbound connectivity proven and log retention checked against the bank\'s requirement.','Build record and connectivity tests'],
+  ['Testing','Functional, load, security and tamper testing on pilot devices, with test alerts proven to reach the SOC (Security Operations Centre).','Test evidence pack'],
+  ['Waves and hypercare','One CAB change per wave. Each wave is watched closely until stable, and closes on proof, never on a count of installed agents, before the next is requested.','CAB pack and approval per wave'],
+  ['Handover and closure','SOC and operations accept the platform. The old one is retired properly: data kept for its retention period, access revoked, records updated.','Closure report and decommission record']];
+ var steps=[].slice.call(document.querySelectorAll('.step'));
+ function stage(i){steps.forEach(function(b,j){b.setAttribute('aria-selected',j===i);b.tabIndex=j===i?0:-1});
+  document.getElementById('sg-k').textContent='Stage '+(i+1)+' of 8';document.getElementById('sg-t').textContent=S[i][0];
+  document.getElementById('sg-d').textContent=S[i][1];document.getElementById('sg-r').textContent=S[i][2];
+  var c=document.querySelector('.stage-card');c.classList.remove('enter');void c.offsetWidth;c.classList.add('enter')}
+ steps.forEach(function(b,i){b.addEventListener('click',function(){stage(i)});
+  b.addEventListener('keydown',function(ev){var d=ev.key==='ArrowRight'?1:ev.key==='ArrowLeft'?-1:0;if(!d)return;var nx=steps[(i+d+8)%8];nx.focus();nx.click()})});
+ stage(0);
+})();
+</script>
+</body>
+</html>
